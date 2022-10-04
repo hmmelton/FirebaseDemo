@@ -22,14 +22,12 @@ private const val TAG = "UserStateViewModel"
 class FirebaseAuthManager @Inject constructor(
     private val auth: FirebaseAuth
 ) : AuthManager {
-    private var isAuthenticated = mutableStateOf(auth.currentUser != null)
-
-    override fun getAuthenticationState() = isAuthenticated
+    override val isAuthenticated: Boolean
+        get() = auth.currentUser != null
 
     override suspend fun signInWithEmail(email: String, password: String): Response {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
-            isAuthenticated.value = true
             Success
         } catch (e: Exception) {
             Log.e(TAG, "error signing in", e)
@@ -40,7 +38,6 @@ class FirebaseAuthManager @Inject constructor(
     override suspend fun registerWithEmail(email: String, password: String): Response {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
-            isAuthenticated.value = true
             Success
         } catch (e: Exception) {
             Log.e(TAG, "error registering", e)
@@ -51,6 +48,5 @@ class FirebaseAuthManager @Inject constructor(
     override fun signOut() {
         auth.signOut()
         auth.addAuthStateListener {  }
-        isAuthenticated.value = false
     }
 }

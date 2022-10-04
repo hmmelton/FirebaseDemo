@@ -11,16 +11,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import com.hmmelton.firebasedemo.composables.screens.HomeScreen
 import com.hmmelton.firebasedemo.composables.screens.MainScreenController
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 import com.hmmelton.firebasedemo.utils.FirebaseAuthManager
-import com.hmmelton.firebasedemo.utils.NoopAuthManager
 import javax.inject.Inject
 
 private const val TAG = "MainActivity"
@@ -77,13 +73,5 @@ class MainActivity : ComponentActivity() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun DefaultPreview() {
-    FirebaseDemoTheme {
-        HomeScreen(NoopAuthManager())
     }
 }

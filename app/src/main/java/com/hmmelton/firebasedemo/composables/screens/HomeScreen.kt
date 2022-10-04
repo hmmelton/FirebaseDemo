@@ -16,13 +16,14 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hmmelton.firebasedemo.composables.RequestNotificationPermission
-import com.hmmelton.firebasedemo.utils.AuthManager
+import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 
 @Composable
-fun HomeScreen(auth: AuthManager) {
+fun HomeScreen(onSignOutClick: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -37,7 +38,7 @@ fun HomeScreen(auth: AuthManager) {
         )
         Text(text = "Welcome!", fontSize = 30.sp)
         Spacer(modifier = Modifier.padding(vertical = 8.dp))
-        Button(onClick = { auth.signOut() }) {
+        Button(onClick = { onSignOutClick() }) {
             Text("Sign out")
         }
 
@@ -45,5 +46,13 @@ fun HomeScreen(auth: AuthManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             RequestNotificationPermission()
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun DefaultPreview() {
+    FirebaseDemoTheme {
+        HomeScreen {}
     }
 }
