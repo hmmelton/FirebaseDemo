@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -121,7 +119,7 @@ fun PasswordTextField(
         onValueChange = { onValueChanged(it.trim()) },
         label = { Text("Enter password") },
         isError = isError,
-        errorText = "Enter",
+        errorText = "Enter valid password",
         singleLine = true,
         visualTransformation = PasswordVisualTransformation() ,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
