@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.hmmelton.firebasedemo.BuildConfig
@@ -38,6 +39,11 @@ fun RequestNotificationPermission() {
         Manifest.permission.POST_NOTIFICATIONS
     ) {
         permissionAlreadyRequested = true
+    }
+
+    // Return early if permission has already been granted
+    if (notificationPermissionState.status.isGranted) {
+        return
     }
 
     if (!permissionAlreadyRequested && !notificationPermissionState.status.shouldShowRationale) {
