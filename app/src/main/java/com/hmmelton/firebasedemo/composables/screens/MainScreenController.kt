@@ -29,6 +29,8 @@ fun MainScreenController(auth: AuthManager) {
                     val response = auth.signInWithEmail(email, password)
                     if (response == Success) {
                         isAuthenticated = true
+                    } else {
+                        // TODO: show dialog
                     }
                 }
             },
@@ -37,6 +39,8 @@ fun MainScreenController(auth: AuthManager) {
                     val response = auth.registerWithEmail(email, password)
                     if (response == Success) {
                         isAuthenticated = true
+                    } else {
+                        // TODO: show dialog
                     }
                 }
             }
