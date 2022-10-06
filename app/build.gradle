@@ -19,12 +19,27 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        manifestPlaceholders = [useCleartext:"false"]
+    }
+    signingConfigs {
+        release {
+            storeFile file("firebasedemo-release-key.jks")
+            storePassword System.getenv('FIREBASE_DEMO_PW')
+            keyAlias System.getenv('FIREBASE_DEMO_ALIAS')
+            keyPassword System.getenv('FIREBASE_DEMO_PW')
+        }
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            applicationIdSuffix ".debug"
+            manifestPlaceholders = [useCleartext:"true"]
         }
     }
     compileOptions {
