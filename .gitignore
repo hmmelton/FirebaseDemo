@@ -8,3 +8,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+.firebaserc
+firebase-debug.log
+firebase.json
