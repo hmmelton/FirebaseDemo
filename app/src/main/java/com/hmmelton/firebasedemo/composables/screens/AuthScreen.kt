@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hmmelton.firebasedemo.composables.views.OutlinedTextFieldWithErrorView
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
+import com.hmmelton.firebasedemo.utils.AuthManager
 
 @Composable
 fun AuthScreen(
@@ -51,24 +52,20 @@ fun AuthScreen(
         Text(text = "FirebaseDemo", fontSize = 30.sp)
         Spacer(modifier = Modifier.padding(8.dp))
         EmailTextField(value = email, isError = invalidEmail) { newEntry ->
-            if (newEntry.isEmpty()) {
-                invalidEmail = true
-            }
             email = newEntry
         }
         PasswordTextField(value = password, isError = invalidPassword) { newEntry ->
-            if (newEntry.isEmpty()) {
-                invalidPassword = true
-            }
             password = newEntry
         }
         Button(
             modifier = modifier,
             onClick = {
-                if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                invalidEmail = !isValidEmail(email)
+                invalidPassword = isValidPassword(password)
+
+                // Only process click if email and password are valid
+                if (!invalidEmail && !invalidPassword) {
                     onSignInClick(email, password)
-                } else {
-                    invalidEmail = true
                 }
             }
         ) {
@@ -77,10 +74,12 @@ fun AuthScreen(
         Button(
             modifier = modifier,
             onClick = {
-                if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                invalidEmail = !isValidEmail(email)
+                invalidPassword = isValidPassword(password)
+
+                // Only process click if email and password are valid
+                if (!invalidEmail && !invalidPassword) {
                     onRegisterClick(email, password)
-                } else {
-                    invalidEmail = true
                 }
             }
         ) {
@@ -124,6 +123,17 @@ fun PasswordTextField(
         visualTransformation = PasswordVisualTransformation() ,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
     )
+}
+
+private fun isValidEmail(email: String): Boolean {
+    return email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+/**
+ * Function to check if given password matches
+ */
+private fun isValidPassword(password: String): Boolean {
+    return password.length > AuthManager.PASSWORD_MIN_LENGTH
 }
 
 @Preview(showBackground = true, showSystemUi = true)

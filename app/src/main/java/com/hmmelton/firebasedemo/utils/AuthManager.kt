@@ -1,12 +1,15 @@
 package com.hmmelton.firebasedemo.utils
 
-import androidx.compose.runtime.MutableState
 import com.hmmelton.firebasedemo.data.model.Response
 
 /**
  * Interface for authentication managers
  */
 interface AuthManager {
+
+    companion object {
+        const val PASSWORD_MIN_LENGTH = 8
+    }
 
     val isAuthenticated: Boolean
 
