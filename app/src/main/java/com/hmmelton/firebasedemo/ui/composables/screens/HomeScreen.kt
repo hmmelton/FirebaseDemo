@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.composables.screens
+package com.hmmelton.firebasedemo.ui.composables.screens
 
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hmmelton.firebasedemo.composables.RequestNotificationPermission
+import com.hmmelton.firebasedemo.ui.composables.RequestNotificationPermission
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 
 @Composable

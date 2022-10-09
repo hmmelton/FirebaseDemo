@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.composables.screens
+package com.hmmelton.firebasedemo.ui.composables.screens
 
 import android.util.Log
 import androidx.compose.runtime.Composable
