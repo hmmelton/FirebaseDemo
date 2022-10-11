@@ -1,6 +1,5 @@
 package com.hmmelton.firebasedemo.ui.composables.screens
 
-import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,12 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,70 +22,96 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.ui.composables.views.OutlinedTextFieldWithErrorView
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
-import com.hmmelton.firebasedemo.utils.AuthManager
+import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun AuthScreen(
-    onSignInClick: (String, String) -> Unit,
-    onRegisterClick: (String, String) -> Unit
+    onAuthenticated: () -> Unit,
+    viewModel: AuthViewModel = viewModel()
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-
-    // Flag if user entered invalid values
-    var invalidEmail by rememberSaveable { mutableStateOf(false) }
-    var invalidPassword by rememberSaveable { mutableStateOf(false) }
-
     val modifier = Modifier
         .padding(top = 8.dp)
         .fillMaxWidth()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(48.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "FirebaseDemo", fontSize = 30.sp)
-        Spacer(modifier = Modifier.padding(8.dp))
-        EmailTextField(value = email, isError = invalidEmail) { newEntry ->
-            email = newEntry
-        }
-        PasswordTextField(value = password, isError = invalidPassword) { newEntry ->
-            password = newEntry
-        }
-        Button(
-            modifier = modifier,
-            onClick = {
-                invalidEmail = !isValidEmail(email)
-                invalidPassword = isValidPassword(password)
+    val snackbarHostState = remember { SnackbarHostState() }
 
-                // Only process click if email and password are valid
-                if (!invalidEmail && !invalidPassword) {
-                    onSignInClick(email, password)
-                }
-            }
-        ) {
-            Text("Sign In")
-        }
-        Button(
-            modifier = modifier,
-            onClick = {
-                invalidEmail = !isValidEmail(email)
-                invalidPassword = isValidPassword(password)
-
-                // Only process click if email and password are valid
-                if (!invalidEmail && !invalidPassword) {
-                    onRegisterClick(email, password)
-                }
-            }
-        ) {
-            Text("Register")
+    // Conflated channel ensures we never have more than 1 Snackbar at a time
+    val channel = remember { Channel<String>(Channel.Factory.CONFLATED) }
+    LaunchedEffect(channel) {
+        channel.receiveAsFlow().collect { message ->
+            // Snackbars here are used to notify user of auth error, so no need to read result
+            snackbarHostState.showSnackbar(message = message)
         }
     }
+
+    Scaffold(
+        scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
+        content = { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(48.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "FirebaseDemo", fontSize = 30.sp)
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                // Credential inputs
+                EmailTextField(
+                    value = viewModel.email,
+                    isError = viewModel.invalidEmail
+                ) { newEntry ->
+                    viewModel.email = newEntry
+                }
+                PasswordTextField(
+                    value = viewModel.password,
+                    isError = viewModel.invalidPassword
+                ) { newEntry ->
+                    viewModel.password = newEntry
+                }
+
+                // Sign in button
+                Button(
+                    modifier = modifier,
+                    onClick = {
+                        viewModel.onSignInClick { response ->
+                            if (response is Error) {
+                                channel.trySend(response.message)
+                            } else {
+                                onAuthenticated()
+                            }
+                        }
+                    }
+                ) {
+                    Text("Sign In")
+                }
+
+                // Registration button
+                Button(
+                    modifier = modifier,
+                    onClick = {
+                        viewModel.onRegistrationClick { response ->
+                            if (response is Error) {
+                                channel.trySend(response.message)
+                            } else {
+                                onAuthenticated()
+                            }
+                        }
+                    }
+                ) {
+                    Text("Register")
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -125,24 +151,10 @@ fun PasswordTextField(
     )
 }
 
-private fun isValidEmail(email: String): Boolean {
-    return email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
-}
-
-/**
- * Function to check if given password matches
- */
-private fun isValidPassword(password: String): Boolean {
-    return password.length > AuthManager.PASSWORD_MIN_LENGTH
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun AuthPreview() {
     FirebaseDemoTheme {
-        AuthScreen(
-            onSignInClick = {_, _ -> },
-            onRegisterClick = {_, _ ->}
-        )
+        AuthScreen(onAuthenticated = {})
     }
 }

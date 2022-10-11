@@ -12,11 +12,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import com.hmmelton.firebasedemo.composables.screens.MainScreenController
+import com.hmmelton.firebasedemo.ui.composables.screens.AuthScreen
+import com.hmmelton.firebasedemo.ui.composables.screens.HomeScreen
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
-import com.hmmelton.firebasedemo.utils.FirebaseAuthManager
+import com.hmmelton.firebasedemo.utils.AuthManager
+import com.hmmelton.firebasedemo.utils.Routes
 import javax.inject.Inject
 
 private const val TAG = "MainActivity"
@@ -24,7 +29,7 @@ private const val TAG = "MainActivity"
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var firebaseAuthManager: FirebaseAuthManager
+    lateinit var authManager: AuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Ask Dagger to inject dependencies
@@ -37,12 +42,34 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainScreenController(firebaseAuthManager)
+                    val navController = rememberNavController()
+                    val startDestination = if (authManager.isAuthenticated) {
+                        Routes.HOME
+                    } else {
+                        Routes.LOGIN
+                    }
+                    NavHost(navController = navController, startDestination = startDestination) {
+                        composable(Routes.LOGIN) {
+                            AuthScreen(
+                                onAuthenticated = { navController.navigate(Routes.HOME) }
+                            )
+                        }
+                        composable(Routes.HOME) {
+                            HomeScreen {
+                                authManager.signOut()
+                                navController.navigate(Routes.LOGIN) {
+                                    popUpTo(Routes.HOME) { inclusive = true }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
 
         createNotificationChannel()
+
+        // Fetching the token from logcat is how we can specify where to send a test notification
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)

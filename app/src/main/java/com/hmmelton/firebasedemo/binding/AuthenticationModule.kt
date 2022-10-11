@@ -7,6 +7,9 @@ import com.hmmelton.firebasedemo.utils.FirebaseAuthManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Singleton
 
 @Module
 abstract class AuthenticationModule {
@@ -23,5 +26,8 @@ abstract class AuthenticationModule {
             }
             return auth
         }
+
+        @Provides
+        fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
     }
 }
