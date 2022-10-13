@@ -8,14 +8,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hmmelton.firebasedemo.data.model.Response
 import com.hmmelton.firebasedemo.utils.AuthManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
  * [ViewModel] used for authentication screen
  */
-open class AuthViewModel @Inject constructor(
+@HiltViewModel
+class AuthViewModel @Inject constructor(
     private val authManager: AuthManager,
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -30,37 +38,76 @@ open class AuthViewModel @Inject constructor(
     var invalidPassword by mutableStateOf(false)
         private set
 
+    // Used for screen to track UI state
+    private val _uiState = MutableStateFlow(AuthUiState())
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+
+    // Coroutine job prevents concurrent sign in/registration attempts
+    private var authenticationJob: Job? = null
+
     /**
      * This function processes the sign in button click.
-     * @param onResult function that takes the authentication response
      */
-    fun onSignInClick(onResult: (Response) -> Unit) {
-        invalidEmail = !isValidEmail(email)
-        invalidPassword = isValidPassword(password)
+    fun onSignInClick() {
+        if (authenticationJob != null) return
 
-        // Only process click if email and password are valid
-        if (!invalidEmail && !invalidPassword) {
-            viewModelScope.launch(dispatcher) {
+        authenticationJob = viewModelScope.launch(dispatcher) {
+            invalidEmail = !isValidEmail(email)
+
+            // Only process click if email and password are valid
+            if (!invalidEmail) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        response = null
+                    )
+                }
+                delay(2000L)
                 val response = authManager.signInWithEmail(email, password)
-                onResult(response)
+
+                // Update UI state with result of sign in attempt
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        response = response
+                    )
+                }
             }
+
+            authenticationJob = null
         }
     }
 
     /**
      * This function processes the registration button click.
-     * @param onResult function that takes the authentication response
      */
-    fun onRegistrationClick(onResult: (Response) -> Unit) {
-        invalidEmail = !isValidEmail(email)
-        invalidPassword = isValidPassword(password)
+    fun onRegistrationClick() {
+        if (authenticationJob != null) return
 
-        // Only process click if email and password are valid
-        if (!invalidEmail && !invalidPassword) {
-            viewModelScope.launch(dispatcher) {
+        authenticationJob = viewModelScope.launch(dispatcher) {
+            invalidEmail = !isValidEmail(email)
+            invalidPassword = !isValidPassword(password)
+
+            // Only process click if email and password are valid
+            if (!invalidEmail && !invalidPassword) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = true,
+                        response = null
+                    )
+                }
                 val response = authManager.registerWithEmail(email, password)
-                onResult(response)
+
+                // Update UI state with result of registration attempt
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        response = response
+                    )
+                }
             }
+
+            authenticationJob = null
         }
     }
 
@@ -78,3 +125,12 @@ open class AuthViewModel @Inject constructor(
         return password.length > AuthManager.PASSWORD_MIN_LENGTH
     }
 }
+
+/**
+ * Class for tracking UI state of auth screen
+ */
+data class AuthUiState(
+    val isLoading: Boolean = false,
+    // Auth response initially null, as request has not been made
+    val response: Response? = null
+)

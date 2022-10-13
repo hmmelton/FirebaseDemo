@@ -14,7 +14,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,18 +38,19 @@ fun AuthScreen(
     onAuthenticated: () -> Unit,
     viewModel: AuthViewModel = viewModel()
 ) {
-    val modifier = Modifier
-        .padding(top = 8.dp)
-        .fillMaxWidth()
+    val uiState by viewModel.uiState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Conflated channel ensures we never have more than 1 Snackbar at a time
-    val channel = remember { Channel<String>(Channel.Factory.CONFLATED) }
-    LaunchedEffect(channel) {
-        channel.receiveAsFlow().collect { message ->
-            // Snackbars here are used to notify user of auth error, so no need to read result
-            snackbarHostState.showSnackbar(message = message)
+    uiState.response?.let { response ->
+        val currentOnAuthenticated by rememberUpdatedState(onAuthenticated)
+        LaunchedEffect(uiState) {
+            if (response is Error) {
+                // Snackbars here are used to notify user of auth error, so no need to read result
+                snackbarHostState.showSnackbar(message = response.message)
+            } else {
+                currentOnAuthenticated()
+            }
         }
     }
 
@@ -80,32 +84,22 @@ fun AuthScreen(
 
                 // Sign in button
                 Button(
-                    modifier = modifier,
-                    onClick = {
-                        viewModel.onSignInClick { response ->
-                            if (response is Error) {
-                                channel.trySend(response.message)
-                            } else {
-                                onAuthenticated()
-                            }
-                        }
-                    }
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
+                    onClick = { viewModel.onSignInClick() },
+                    enabled = !uiState.isLoading
                 ) {
                     Text("Sign In")
                 }
 
                 // Registration button
                 Button(
-                    modifier = modifier,
-                    onClick = {
-                        viewModel.onRegistrationClick { response ->
-                            if (response is Error) {
-                                channel.trySend(response.message)
-                            } else {
-                                onAuthenticated()
-                            }
-                        }
-                    }
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
+                    onClick = { viewModel.onRegistrationClick() },
+                    enabled = !uiState.isLoading
                 ) {
                     Text("Register")
                 }
