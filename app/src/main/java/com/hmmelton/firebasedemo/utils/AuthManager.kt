@@ -1,5 +1,6 @@
 package com.hmmelton.firebasedemo.utils
 
+import androidx.compose.runtime.MutableState
 import com.hmmelton.firebasedemo.data.model.Response
 
 /**
@@ -11,7 +12,9 @@ interface AuthManager {
         const val PASSWORD_MIN_LENGTH = 8
     }
 
-    val isAuthenticated: Boolean
+    fun isAuthenticated(): Boolean
+
+    fun observeAuthState(): MutableState<Boolean>
 
     /**
      * Sign in an existing user with email and password

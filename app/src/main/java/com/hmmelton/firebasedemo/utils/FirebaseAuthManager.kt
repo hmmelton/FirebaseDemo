@@ -1,6 +1,10 @@
 package com.hmmelton.firebasedemo.utils
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.hmmelton.firebasedemo.data.model.Error
@@ -23,8 +27,18 @@ class FirebaseAuthManager @Inject constructor(
     private val auth: FirebaseAuth,
     private val dispatcher: CoroutineDispatcher
 ) : AuthManager {
-    override val isAuthenticated: Boolean
-        get() = auth.currentUser != null
+
+    private var _isAuthenticated = mutableStateOf(auth.currentUser != null)
+
+    init {
+        auth.addAuthStateListener { newAuth ->
+            _isAuthenticated.value = newAuth.currentUser != null
+        }
+    }
+
+    override fun isAuthenticated() = _isAuthenticated.value
+
+    override fun observeAuthState() = _isAuthenticated
 
     override suspend fun signInWithEmail(email: String, password: String): Response {
         return withContext(dispatcher) {

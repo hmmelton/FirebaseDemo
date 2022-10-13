@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,20 +21,20 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.hmmelton.firebasedemo.ui.composables.screens.AuthScreen
 import com.hmmelton.firebasedemo.ui.composables.screens.HomeScreen
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
+import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
 import com.hmmelton.firebasedemo.utils.AuthManager
 import com.hmmelton.firebasedemo.utils.Routes
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 private const val TAG = "MainActivity"
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var authManager: AuthManager
+    @Inject lateinit var authManager: AuthManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Ask Dagger to inject dependencies
-        (application as FirebaseDemoApplication).appComponent.inject(this)
         super.onCreate(savedInstanceState)
         setContent {
             FirebaseDemoTheme {
@@ -43,24 +44,21 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    val startDestination = if (authManager.isAuthenticated) {
+                    val startDestination = if (authManager.isAuthenticated()) {
                         Routes.HOME
                     } else {
                         Routes.LOGIN
                     }
                     NavHost(navController = navController, startDestination = startDestination) {
                         composable(Routes.LOGIN) {
+                            val viewModel = hiltViewModel<AuthViewModel>()
                             AuthScreen(
-                                onAuthenticated = { navController.navigate(Routes.HOME) }
+                                onAuthenticated = { navController.navigate(Routes.HOME) },
+                                viewModel = viewModel
                             )
                         }
                         composable(Routes.HOME) {
-                            HomeScreen {
-                                authManager.signOut()
-                                navController.navigate(Routes.LOGIN) {
-                                    popUpTo(Routes.HOME) { inclusive = true }
-                                }
-                            }
+                            HomeScreen()
                         }
                     }
                 }

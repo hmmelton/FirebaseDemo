@@ -3,12 +3,9 @@ package com.hmmelton.firebasedemo.ui.composables.screens
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -23,7 +20,7 @@ import com.hmmelton.firebasedemo.ui.composables.RequestNotificationPermission
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 
 @Composable
-fun HomeScreen(onSignOutClick: () -> Unit) {
+fun HomeScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -37,10 +34,6 @@ fun HomeScreen(onSignOutClick: () -> Unit) {
             contentDescription = "Account icon"
         )
         Text(text = "Welcome!", fontSize = 30.sp)
-        Spacer(modifier = Modifier.padding(vertical = 8.dp))
-        Button(onClick = { onSignOutClick() }) {
-            Text("Sign out")
-        }
 
         // If SDK version >= 33, we must request runtime permission for notifications
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -53,6 +46,6 @@ fun HomeScreen(onSignOutClick: () -> Unit) {
 @Composable
 fun DefaultPreview() {
     FirebaseDemoTheme {
-        HomeScreen {}
+        HomeScreen()
     }
 }
