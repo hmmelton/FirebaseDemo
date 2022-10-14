@@ -62,7 +62,6 @@ class AuthViewModel @Inject constructor(
                         response = null
                     )
                 }
-                delay(2000L)
                 val response = authManager.signInWithEmail(email, password)
 
                 // Update UI state with result of sign in attempt

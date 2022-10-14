@@ -58,7 +58,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Routes.HOME) {
-                            HomeScreen()
+                            HomeScreen {
+                                authManager.signOut()
+                                navController.navigate(Routes.LOGIN) {
+                                    popUpTo(Routes.HOME) { inclusive = true }
+                                }
+                            }
                         }
                     }
                 }
