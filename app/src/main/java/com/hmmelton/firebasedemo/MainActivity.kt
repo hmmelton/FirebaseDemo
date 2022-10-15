@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.hmmelton.firebasedemo.ui.composables.MainNavHost
 import com.hmmelton.firebasedemo.ui.composables.screens.AuthScreen
 import com.hmmelton.firebasedemo.ui.composables.screens.HomeScreen
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
@@ -50,26 +51,7 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Routes.LOGIN
                     }
-                    NavHost(navController = navController, startDestination = startDestination) {
-                        composable(Routes.LOGIN) {
-                            val viewModel = hiltViewModel<AuthViewModel>()
-                            AuthScreen(
-                                onAuthenticated = { navController.navigate(Routes.HOME) },
-                                viewModel = viewModel
-                            )
-                        }
-                        composable(Routes.HOME) {
-                            val viewModel = hiltViewModel<MainViewModel>()
-                            HomeScreen(
-                                onSignedOut = {
-                                    navController.navigate(Routes.LOGIN) {
-                                        popUpTo(Routes.HOME) { inclusive = true }
-                                    }
-                                },
-                                viewModel = viewModel
-                            )
-                        }
-                    }
+                    MainNavHost(navController, startDestination)
                 }
             }
         }
