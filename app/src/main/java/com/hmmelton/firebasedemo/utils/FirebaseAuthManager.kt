@@ -1,17 +1,13 @@
 package com.hmmelton.firebasedemo.utils
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Response
 import com.hmmelton.firebasedemo.data.model.Success
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
