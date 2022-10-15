@@ -10,13 +10,18 @@ import com.hmmelton.firebasedemo.ui.composables.screens.AuthScreen
 import com.hmmelton.firebasedemo.ui.composables.screens.HomeScreen
 import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
 import com.hmmelton.firebasedemo.ui.viewmodels.MainViewModel
+import com.hmmelton.firebasedemo.utils.AuthManager
 import com.hmmelton.firebasedemo.utils.Routes
 
 /**
  * Composable for [com.hmmelton.firebasedemo.MainActivity] navigation host.
  */
 @Composable
-fun MainNavHost(navController: NavHostController, startDestination: String) {
+fun MainNavHost(
+    navController: NavHostController,
+    startDestination: String,
+    authManager: AuthManager
+) {
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Routes.LOGIN) {
             val viewModel = hiltViewModel<AuthViewModel>()
@@ -40,11 +45,10 @@ fun MainNavHost(navController: NavHostController, startDestination: String) {
     }
 
     // Listen for user to become unauthenticated, then navigate to login screen
-    FirebaseAuth.getInstance().addAuthStateListener { auth ->
-        if (auth.currentUser == null) {
-            navController.navigate(Routes.LOGIN) {
-                popUpTo(Routes.HOME) { inclusive = true }
-            }
+    // TODO: check how this affects recomposition - need
+    if (!authManager.observeAuthState().value) {
+        navController.navigate(Routes.LOGIN) {
+            popUpTo(Routes.HOME) { inclusive = true }
         }
     }
 }

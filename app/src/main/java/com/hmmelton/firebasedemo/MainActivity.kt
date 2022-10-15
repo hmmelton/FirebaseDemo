@@ -11,19 +11,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.hmmelton.firebasedemo.ui.composables.MainNavHost
-import com.hmmelton.firebasedemo.ui.composables.screens.AuthScreen
-import com.hmmelton.firebasedemo.ui.composables.screens.HomeScreen
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
-import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
-import com.hmmelton.firebasedemo.ui.viewmodels.MainViewModel
 import com.hmmelton.firebasedemo.utils.AuthManager
 import com.hmmelton.firebasedemo.utils.Routes
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,12 +40,15 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    val startDestination = if (authManager.isAuthenticated()) {
-                        Routes.HOME
-                    } else {
-                        Routes.LOGIN
+                    val startDestination = rememberSaveable {
+                        if (authManager.isAuthenticated()) {
+                            Routes.HOME
+                        } else {
+                            Routes.LOGIN
+                        }
                     }
-                    MainNavHost(navController, startDestination)
+
+                    MainNavHost(navController, startDestination, authManager)
                 }
             }
         }
