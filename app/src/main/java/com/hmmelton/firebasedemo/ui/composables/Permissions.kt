@@ -47,13 +47,13 @@ fun RequestNotificationPermission() {
     }
 
     if (!permissionAlreadyRequested && !notificationPermissionState.status.shouldShowRationale) {
-        // Request notification permission
         SideEffect {
             notificationPermissionState.launchPermissionRequest()
         }
     } else if (notificationPermissionState.status.shouldShowRationale) {
-        // Display rational for requesting notification permission
         NotificationPermissionDialog {
+            // We do not need to use SideEffect here, because the callback function is
+            // non-Composable
             notificationPermissionState.launchPermissionRequest()
         }
     } else {
