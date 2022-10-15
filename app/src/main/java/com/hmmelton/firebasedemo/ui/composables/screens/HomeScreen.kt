@@ -17,12 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.ui.composables.RequestNotificationPermission
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
+import com.hmmelton.firebasedemo.ui.viewmodels.MainViewModel
 
 @Composable
 fun HomeScreen(
-    onSignOut: () -> Unit
+    onSignedOut: () -> Unit,
+    viewModel: MainViewModel = viewModel()
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -37,7 +40,12 @@ fun HomeScreen(
             contentDescription = "Account icon"
         )
         Text(text = "Welcome!", fontSize = 30.sp)
-        Button(onClick = onSignOut) {
+        Button(
+            onClick = {
+                viewModel.signOut()
+                onSignedOut()
+            }
+        ) {
             Text("Sign out")
         }
 
@@ -52,6 +60,6 @@ fun HomeScreen(
 @Composable
 fun DefaultPreview() {
     FirebaseDemoTheme {
-        HomeScreen {}
+        HomeScreen(onSignedOut = {})
     }
 }

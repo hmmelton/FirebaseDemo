@@ -22,6 +22,7 @@ import com.hmmelton.firebasedemo.ui.composables.screens.AuthScreen
 import com.hmmelton.firebasedemo.ui.composables.screens.HomeScreen
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
+import com.hmmelton.firebasedemo.ui.viewmodels.MainViewModel
 import com.hmmelton.firebasedemo.utils.AuthManager
 import com.hmmelton.firebasedemo.utils.Routes
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,12 +59,15 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(Routes.HOME) {
-                            HomeScreen {
-                                authManager.signOut()
-                                navController.navigate(Routes.LOGIN) {
-                                    popUpTo(Routes.HOME) { inclusive = true }
-                                }
-                            }
+                            val viewModel = hiltViewModel<MainViewModel>()
+                            HomeScreen(
+                                onSignedOut = {
+                                    navController.navigate(Routes.LOGIN) {
+                                        popUpTo(Routes.HOME) { inclusive = true }
+                                    }
+                                },
+                                viewModel = viewModel
+                            )
                         }
                     }
                 }
