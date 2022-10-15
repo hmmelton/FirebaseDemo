@@ -19,7 +19,7 @@ private const val TAG = "FirebaseAuthManager"
 /**
  * [ViewModel] used to track/manage user authentication state.
  */
-class FirebaseAuthManager @Inject constructor(
+class AuthManagerImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val dispatcher: CoroutineDispatcher
 ) : AuthManager {

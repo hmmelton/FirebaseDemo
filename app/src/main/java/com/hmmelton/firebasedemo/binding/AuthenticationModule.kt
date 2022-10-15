@@ -3,7 +3,7 @@ package com.hmmelton.firebasedemo.binding
 import com.google.firebase.auth.FirebaseAuth
 import com.hmmelton.firebasedemo.BuildConfig
 import com.hmmelton.firebasedemo.utils.AuthManager
-import com.hmmelton.firebasedemo.utils.FirebaseAuthManager
+import com.hmmelton.firebasedemo.utils.AuthManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -19,7 +19,7 @@ abstract class AuthenticationModule {
 
     @Singleton
     @Binds
-    abstract fun provideAuthManager(authManager: FirebaseAuthManager): AuthManager
+    abstract fun provideAuthManager(authManager: AuthManagerImpl): AuthManager
 
     companion object {
         @Singleton
