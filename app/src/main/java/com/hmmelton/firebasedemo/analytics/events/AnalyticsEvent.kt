@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.analytics
+package com.hmmelton.firebasedemo.analytics.events
 
 import android.os.Bundle
 

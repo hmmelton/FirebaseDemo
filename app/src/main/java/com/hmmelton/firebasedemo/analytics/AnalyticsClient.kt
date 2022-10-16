@@ -1,5 +1,7 @@
 package com.hmmelton.firebasedemo.analytics
 
+import com.hmmelton.firebasedemo.analytics.events.AnalyticsEvent
+
 /**
  * Interface for analytics logging file
  */

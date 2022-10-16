@@ -4,6 +4,10 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.hmmelton.firebasedemo.analytics.AnalyticsClient
+import com.hmmelton.firebasedemo.analytics.events.AuthType
+import com.hmmelton.firebasedemo.analytics.events.RegisterFailureEvent
+import com.hmmelton.firebasedemo.analytics.events.SignInFailureEvent
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Response
 import com.hmmelton.firebasedemo.data.model.Success
@@ -21,7 +25,8 @@ private const val TAG = "FirebaseAuthManager"
  */
 class AuthManagerImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val analytics: AnalyticsClient
 ) : AuthManager {
 
     private var _isAuthenticated = mutableStateOf(auth.currentUser != null)
@@ -43,6 +48,7 @@ class AuthManagerImpl @Inject constructor(
                 Success
             } catch (e: Exception) {
                 Log.e(TAG, "error signing in", e)
+                analytics.logEvent(SignInFailureEvent(e, AuthType.EMAIL))
                 Error(SIGN_IN_ERROR)
             }
         }
@@ -55,6 +61,7 @@ class AuthManagerImpl @Inject constructor(
                 Success
             } catch (e: Exception) {
                 Log.e(TAG, "error registering", e)
+                analytics.logEvent(RegisterFailureEvent(e, AuthType.EMAIL))
                 Error(REGISTRATION_ERROR)
             }
         }

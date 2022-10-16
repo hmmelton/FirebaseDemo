@@ -1,6 +1,7 @@
 package com.hmmelton.firebasedemo.analytics
 
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.hmmelton.firebasedemo.analytics.events.AnalyticsEvent
 import javax.inject.Inject
 
 /**
