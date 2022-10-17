@@ -3,7 +3,7 @@ package com.hmmelton.firebasedemo.analytics.events
 import android.os.Bundle
 import androidx.core.os.bundleOf
 
-private const val NAME = "SignInFailureEvent"
+private const val NAME = "sign_in_failure"
 
 /**
  * [AnalyticsEvent] used for user sign in failures.

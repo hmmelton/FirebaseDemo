@@ -1,5 +1,6 @@
 package com.hmmelton.firebasedemo.analytics
 
+import android.util.Log
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.hmmelton.firebasedemo.analytics.events.AnalyticsEvent
 import javax.inject.Inject
@@ -12,6 +13,7 @@ class AnalyticsClientImpl @Inject constructor(
 ) : AnalyticsClient {
 
     override fun logEvent(event: AnalyticsEvent) {
+        Log.i("AnalyticsClientImpl", "logging event: ${event.name}")
         analytics.logEvent(event.name, event.getPropertiesBundle())
     }
 }

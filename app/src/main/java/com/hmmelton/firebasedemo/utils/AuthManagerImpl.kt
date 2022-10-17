@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.hmmelton.firebasedemo.analytics.AnalyticsClient
 import com.hmmelton.firebasedemo.analytics.events.AuthType
-import com.hmmelton.firebasedemo.analytics.events.RegisterFailureEvent
+import com.hmmelton.firebasedemo.analytics.events.RegistrationFailureEvent
 import com.hmmelton.firebasedemo.analytics.events.SignInFailureEvent
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Response
@@ -61,7 +61,7 @@ class AuthManagerImpl @Inject constructor(
                 Success
             } catch (e: Exception) {
                 Log.e(TAG, "error registering", e)
-                analytics.logEvent(RegisterFailureEvent(e, AuthType.EMAIL))
+                analytics.logEvent(RegistrationFailureEvent(e, AuthType.EMAIL))
                 Error(REGISTRATION_ERROR)
             }
         }
