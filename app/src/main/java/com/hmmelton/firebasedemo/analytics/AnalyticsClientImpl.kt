@@ -16,4 +16,8 @@ class AnalyticsClientImpl @Inject constructor(
         Log.i("AnalyticsClientImpl", "logging event: ${event.name}")
         analytics.logEvent(event.name, event.getPropertiesBundle())
     }
+
+    override fun setUserId(id: String) {
+        analytics.setUserId(id)
+    }
 }

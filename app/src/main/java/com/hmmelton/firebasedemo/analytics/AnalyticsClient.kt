@@ -7,4 +7,5 @@ import com.hmmelton.firebasedemo.analytics.events.AnalyticsEvent
  */
 interface AnalyticsClient {
     fun logEvent(event: AnalyticsEvent)
+    fun setUserId(id: String)
 }
