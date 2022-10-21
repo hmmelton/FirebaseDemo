@@ -15,7 +15,7 @@ class RegistrationFailureEvent(
 
     override fun getPropertiesBundle(): Bundle {
         return bundleOf(
-            PropertyKeys.STACKTRACE to e.stackTrace,
+            PropertyKeys.STACKTRACE to e.stackTrace.toString(),
             PropertyKeys.AUTH_TYPE to authType
         )
     }
