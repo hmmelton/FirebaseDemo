@@ -2,8 +2,6 @@ package com.hmmelton.firebasedemo.binding
 
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.hmmelton.firebasedemo.analytics.AnalyticsClient
 import com.hmmelton.firebasedemo.analytics.AnalyticsClientImpl
@@ -16,7 +14,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FirebaseModule {
+abstract class AnalyticsModule {
 
     @Singleton
     @Binds
