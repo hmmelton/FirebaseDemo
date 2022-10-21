@@ -2,6 +2,8 @@ package com.hmmelton.firebasedemo.data.repository
 
 import android.util.Log
 import com.google.firebase.database.DatabaseReference
+import com.hmmelton.firebasedemo.analytics.AnalyticsClient
+import com.hmmelton.firebasedemo.analytics.events.UserDatabaseQueryFailureEvent
 import com.hmmelton.firebasedemo.data.model.User
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -15,7 +17,8 @@ private const val TAG = "UserRepository"
  * remotely.
  */
 class UserRepository @Inject constructor(
-    private val database: DatabaseReference
+    private val database: DatabaseReference,
+    private val analytics: AnalyticsClient
 ) : Repository<User> {
 
     override suspend fun create(id: String, item: User): Boolean {
@@ -27,6 +30,7 @@ class UserRepository @Inject constructor(
             database.child(id).get().await()
         } catch (e: Exception) {
             Log.e(TAG, "error fetching User", e)
+            analytics.logEvent(UserDatabaseQueryFailureEvent(id, e))
             return null
         }
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.hmmelton.firebasedemo.analytics.AnalyticsClient
 import com.hmmelton.firebasedemo.analytics.events.AuthType
+import com.hmmelton.firebasedemo.analytics.events.FetchUserFailureEvent
 import com.hmmelton.firebasedemo.analytics.events.RegistrationFailureEvent
 import com.hmmelton.firebasedemo.analytics.events.SignInFailureEvent
 import com.hmmelton.firebasedemo.data.model.Error
@@ -61,6 +62,7 @@ class AuthManagerImpl @Inject constructor(
                 } else {
                     // Sign the user out if the User object cannot be read from the remote database
                     signOut()
+                    analytics.logEvent(FetchUserFailureEvent(false))
                     Error(REGISTRATION_ERROR)
                 }
             } catch (e: Exception) {
@@ -88,6 +90,7 @@ class AuthManagerImpl @Inject constructor(
                 } else {
                     // Sign the user out if the User object cannot be read from the remote database
                     signOut()
+                    analytics.logEvent(FetchUserFailureEvent(true))
                     Error(REGISTRATION_ERROR)
                 }
             } catch (e: Exception) {
