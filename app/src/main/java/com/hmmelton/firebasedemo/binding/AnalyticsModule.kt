@@ -16,7 +16,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class MainModule {
+abstract class FirebaseModule {
 
     @Singleton
     @Binds
@@ -26,18 +26,5 @@ abstract class MainModule {
         @Singleton
         @Provides
         fun provideFirebaseAnalytics(): FirebaseAnalytics = Firebase.analytics
-
-        @Singleton
-        @Provides
-        fun provideFirebaseDatabaseReference(): DatabaseReference {
-            val database = Firebase.database
-            // Persist data locally
-            database.setPersistenceEnabled(true)
-            // According to documentation, 1MB is the min cache size
-            // https://firebase.google.com/docs/reference/android/com/google/firebase/database/FirebaseDatabase#setPersistenceCacheSizeBytes(long)
-            database.setPersistenceCacheSizeBytes(1024 * 1024)
-
-            return database.reference
-        }
     }
 }
