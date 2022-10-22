@@ -13,7 +13,7 @@ class UserDatabaseQueryFailureEvent(
     override fun getPropertiesBundle(): Bundle {
         return bundleOf(
             PropertyKeys.ITEM_KEY to itemKey,
-            PropertyKeys.STACKTRACE to e.stackTrace.toString()
+            PropertyKeys.STACKTRACE to e.stackTraceToString()
         )
     }
 }

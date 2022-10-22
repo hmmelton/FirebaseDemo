@@ -15,7 +15,7 @@ class SignInFailureEvent(
 
     override fun getPropertiesBundle(): Bundle {
         return bundleOf(
-            PropertyKeys.STACKTRACE to e.stackTrace.toString(),
+            PropertyKeys.STACKTRACE to e.stackTraceToString(),
             PropertyKeys.AUTH_TYPE to authType
         )
     }
