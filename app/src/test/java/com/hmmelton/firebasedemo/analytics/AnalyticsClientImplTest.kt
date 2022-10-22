@@ -7,6 +7,7 @@ import io.mockk.coVerify
 import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import org.junit.Assert
 import org.junit.BeforeClass
 import org.junit.Test
@@ -38,7 +39,7 @@ class AnalyticsClientImplTest {
 
         subject.logEvent(event)
 
-        coVerify { firebaseAnalytics.logEvent(TestEvent.NAME, capture(captor)) }
+        verify { firebaseAnalytics.logEvent(TestEvent.NAME, capture(captor)) }
 
         val params = captor.captured
         Assert.assertEquals(1, params.size())
