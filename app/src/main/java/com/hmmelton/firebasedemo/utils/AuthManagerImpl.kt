@@ -14,9 +14,7 @@ import com.hmmelton.firebasedemo.data.model.Response
 import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.data.model.User
 import com.hmmelton.firebasedemo.data.repository.Repository
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val SIGN_IN_ERROR = "Failed to sign in"
@@ -29,7 +27,6 @@ private const val TAG = "FirebaseAuthManager"
 class AuthManagerImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val userRepository: Repository<User>,
-    private val dispatcher: CoroutineDispatcher,
     private val analytics: AnalyticsClient
 ) : AuthManager {
 
@@ -46,58 +43,54 @@ class AuthManagerImpl @Inject constructor(
     override fun observeAuthState() = _isAuthenticated
 
     override suspend fun signInWithEmail(email: String, password: String): Response {
-        return withContext(dispatcher) {
-            try {
-                // Attempt to sign in and fetch authenticated FirebaseUser object
-                val result = auth.signInWithEmailAndPassword(email, password).await()
-                val firebaseUser = result.user ?: return@withContext Error(REGISTRATION_ERROR)
+        return try {
+            // Attempt to sign in and fetch authenticated FirebaseUser object
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            val firebaseUser = result.user ?: return Error(SIGN_IN_ERROR)
 
-                // If user was authenticated, create User object and save to server
-                val user = userRepository.get(firebaseUser.uid)
+            // If user was authenticated, create User object and save to server
+            val user = userRepository.get(firebaseUser.uid)
 
-                if (user != null) {
-                    // Set authenticated user's ID to analytics for tracking
-                    analytics.setUserId(firebaseUser.uid)
-                    Success
-                } else {
-                    // Sign the user out if the User object cannot be read from the remote database
-                    signOut()
-                    analytics.logEvent(FetchUserFailureEvent(false))
-                    Error(REGISTRATION_ERROR)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "error signing in", e)
-                analytics.logEvent(SignInFailureEvent(e, AuthType.EMAIL))
+            if (user != null) {
+                // Set authenticated user's ID to analytics for tracking
+                analytics.setUserId(firebaseUser.uid)
+                Success
+            } else {
+                // Sign the user out if the User object cannot be read from the remote database
+                signOut()
+                analytics.logEvent(FetchUserFailureEvent(false))
                 Error(SIGN_IN_ERROR)
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "error signing in", e)
+            analytics.logEvent(SignInFailureEvent(e, AuthType.EMAIL))
+            Error(SIGN_IN_ERROR)
         }
     }
 
     override suspend fun registerWithEmail(email: String, password: String): Response {
-        return withContext(dispatcher) {
-            try {
-                // Attempt to register user and fetch authenticated FirebaseUser object
-                val result = auth.createUserWithEmailAndPassword(email, password).await()
-                val firebaseUser = result.user ?: return@withContext Error(REGISTRATION_ERROR)
+        return try {
+            // Attempt to register user and fetch authenticated FirebaseUser object
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val firebaseUser = result.user ?: return Error(REGISTRATION_ERROR)
 
-                // If user was authenticated, create User object and save to server
-                val user = userRepository.get(firebaseUser.uid)
+            // If user was authenticated, create User object and save to server
+            val user = userRepository.get(firebaseUser.uid)
 
-                if (user != null) {
-                    // Set authenticated user's ID to analytics for tracking
-                    analytics.setUserId(firebaseUser.uid)
-                    Success
-                } else {
-                    // Sign the user out if the User object cannot be read from the remote database
-                    signOut()
-                    analytics.logEvent(FetchUserFailureEvent(true))
-                    Error(REGISTRATION_ERROR)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "error registering", e)
-                analytics.logEvent(RegistrationFailureEvent(e, AuthType.EMAIL))
+            if (user != null) {
+                // Set authenticated user's ID to analytics for tracking
+                analytics.setUserId(firebaseUser.uid)
+                Success
+            } else {
+                // Sign the user out if the User object cannot be read from the remote database
+                signOut()
+                analytics.logEvent(FetchUserFailureEvent(true))
                 Error(REGISTRATION_ERROR)
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "error registering", e)
+            analytics.logEvent(RegistrationFailureEvent(e, AuthType.EMAIL))
+            Error(REGISTRATION_ERROR)
         }
     }
 
