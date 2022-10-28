@@ -9,6 +9,7 @@ Android:
 - Experimental Compose permissions library
 - System push notifications
 - User authentication flow
+- Kotlin coroutines
 
 Firebase:
 - Push notifications
