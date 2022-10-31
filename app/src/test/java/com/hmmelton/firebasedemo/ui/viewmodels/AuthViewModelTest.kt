@@ -11,7 +11,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -23,6 +22,7 @@ class AuthViewModelTest {
     companion object {
         private const val VALID_EMAIL = "harrison@test.com"
         private const val VALID_PASSWORD = "12345678"
+        private const val INVALID_PASSWORD = "123" // Only rule is must be >= 8 characters
         private const val AUTH_ERROR = "Auth error"
     }
 
@@ -53,33 +53,33 @@ class AuthViewModelTest {
         Assert.assertEquals("", password)
         Assert.assertFalse(invalidEmail)
         Assert.assertFalse(invalidPassword)
-        Assert.assertTrue(uiState == AuthUiState.AuthInit)
+        Assert.assertTrue(uiState == AuthUiState.Init)
     }
 
     @Test
-    fun `onSignInClick with empty email causes invalidEmail and early return`() = runTest {
+    fun `onSignInClick with invalid email causes early return`() {
         subject.onSignInClick()
 
         val uiState = subject.uiState.value
-        Assert.assertTrue(uiState == AuthUiState.AuthInit)
+        Assert.assertEquals(AuthUiState.Init, uiState)
+        Assert.assertTrue(subject.invalidEmail)
         coVerify(exactly = 0) { authManager.signInWithEmail(any(), any()) }
     }
 
     @Test
-    fun `onSignInClick updates uiState with error when auth fails`() = runTest {
+    fun `onSignInClick updates uiState with error when auth fails`() {
         val uiState = subject.uiState
         subject.email = VALID_EMAIL
         subject.password = VALID_PASSWORD
         val authError = Error(AUTH_ERROR)
         coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers  {
-            Assert.assertEquals(AuthUiState.AuthLoading, uiState.value)
+            Assert.assertEquals(AuthUiState.Loading, uiState.value)
             authError
         }
 
         subject.onSignInClick()
 
-        Assert.assertTrue(uiState.value is AuthUiState.AuthFailure)
-
+        Assert.assertTrue(uiState.value is AuthUiState.Failure)
         coVerify(exactly = 1) { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) }
     }
 
@@ -89,14 +89,74 @@ class AuthViewModelTest {
         subject.email = VALID_EMAIL
         subject.password = VALID_PASSWORD
         coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
-            Assert.assertEquals(AuthUiState.AuthLoading, uiState.value)
+            Assert.assertEquals(AuthUiState.Loading, uiState.value)
             Success
         }
 
         subject.onSignInClick()
 
-        Assert.assertEquals(AuthUiState.AuthSuccess, uiState.value)
-
+        Assert.assertEquals(AuthUiState.Success, uiState.value)
         coVerify(exactly = 1) { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) }
+    }
+
+    @Test
+    fun `onRegistrationClick with invalid email causes early return`() {
+        // Set to ensure failure is from bad email
+        subject.password = VALID_PASSWORD
+
+        subject.onRegistrationClick()
+
+        val uiState = subject.uiState.value
+        Assert.assertEquals(AuthUiState.Init, uiState)
+        Assert.assertTrue(subject.invalidEmail)
+        Assert.assertFalse(subject.invalidPassword)
+        coVerify(exactly = 0) { authManager.registerWithEmail(any(), any()) }
+    }
+
+    @Test
+    fun `onRegistrationClick with invalid password causes early return`() {
+        subject.email = VALID_EMAIL
+        subject.password = INVALID_PASSWORD
+
+        subject.onRegistrationClick()
+
+        val uiState = subject.uiState.value
+        Assert.assertEquals(AuthUiState.Init, uiState)
+        Assert.assertFalse(subject.invalidEmail)
+        Assert.assertTrue(subject.invalidPassword)
+        coVerify(exactly = 0) { authManager.registerWithEmail(any(), any()) }
+    }
+
+    @Test
+    fun `onRegistrationClick updates uiState with error when auth fails`() {
+        val uiState = subject.uiState
+        subject.email = VALID_EMAIL
+        subject.password = VALID_PASSWORD
+        val authError = Error(AUTH_ERROR)
+        coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
+            Assert.assertEquals(AuthUiState.Loading, uiState.value)
+            authError
+        }
+
+        subject.onRegistrationClick()
+
+        Assert.assertTrue(uiState.value is AuthUiState.Failure)
+        coVerify(exactly = 1) { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) }
+    }
+
+    @Test
+    fun `onRegistrationClick updates uiState with success when auth succeeds`() {
+        val uiState = subject.uiState
+        subject.email = VALID_EMAIL
+        subject.password = VALID_PASSWORD
+        coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
+            Assert.assertEquals(AuthUiState.Loading, uiState.value)
+            Success
+        }
+
+        subject.onRegistrationClick()
+
+        Assert.assertEquals(AuthUiState.Success, uiState.value)
+        coVerify(exactly = 1) { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) }
     }
 }

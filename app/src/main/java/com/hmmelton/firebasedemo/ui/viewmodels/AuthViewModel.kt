@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Response
-import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.utils.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,7 +35,7 @@ class AuthViewModel @Inject constructor(
         private set
 
     // Used for screen to track UI state
-    var uiState = mutableStateOf<AuthUiState>(AuthUiState.AuthInit)
+    var uiState = mutableStateOf<AuthUiState>(AuthUiState.Init)
         private set
 
     // Coroutine job prevents concurrent sign in/registration attempts
@@ -53,14 +52,14 @@ class AuthViewModel @Inject constructor(
 
             // Only process click if email and password are valid
             if (!invalidEmail) {
-                uiState.value = AuthUiState.AuthLoading
+                uiState.value = AuthUiState.Loading
                 val response = authManager.signInWithEmail(email, password)
 
                 // Update UI state with result of sign in attempt
                 uiState.value = if (response is Error) {
-                    AuthUiState.AuthFailure(response)
+                    AuthUiState.Failure(response)
                 } else {
-                    AuthUiState.AuthSuccess
+                    AuthUiState.Success
                 }
             }
 
@@ -80,14 +79,14 @@ class AuthViewModel @Inject constructor(
 
             // Only process click if email and password are valid
             if (!invalidEmail && !invalidPassword) {
-                uiState.value = AuthUiState.AuthLoading
+                uiState.value = AuthUiState.Loading
                 val response = authManager.registerWithEmail(email, password)
 
                 // Update UI state with result of registration attempt
                 uiState.value = if (response is Error) {
-                    AuthUiState.AuthFailure(response)
+                    AuthUiState.Failure(response)
                 } else {
-                    AuthUiState.AuthSuccess
+                    AuthUiState.Success
                 }
             }
 
@@ -106,7 +105,7 @@ class AuthViewModel @Inject constructor(
      * This function checks if the given password matches requirements.
      */
     private fun isValidPassword(password: String): Boolean {
-        return password.length > AuthManager.PASSWORD_MIN_LENGTH
+        return password.length >= AuthManager.PASSWORD_MIN_LENGTH
     }
 }
 
@@ -114,10 +113,10 @@ class AuthViewModel @Inject constructor(
  * Class for tracking UI state of auth screen
  */
 sealed class AuthUiState(val response: Response?) {
-    object AuthInit: AuthUiState(null)
-    object AuthLoading: AuthUiState(null)
-    object AuthSuccess: AuthUiState(Success)
-    class AuthFailure(error: Error): AuthUiState(error)
+    object Init: AuthUiState(null)
+    object Loading: AuthUiState(null)
+    object Success: AuthUiState(com.hmmelton.firebasedemo.data.model.Success)
+    class Failure(error: Error): AuthUiState(error)
 
-    fun isLoading() = this is AuthInit
+    fun isLoading() = this is Init
 }
