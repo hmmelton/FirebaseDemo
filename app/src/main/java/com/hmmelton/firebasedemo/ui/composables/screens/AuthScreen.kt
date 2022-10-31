@@ -38,7 +38,7 @@ fun AuthScreen(
     onAuthenticated: () -> Unit,
     viewModel: AuthViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -88,7 +88,7 @@ fun AuthScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     onClick = { viewModel.onSignInClick() },
-                    enabled = !uiState.isLoading
+                    enabled = !uiState.isLoading()
                 ) {
                     Text("Sign In")
                 }
@@ -99,7 +99,7 @@ fun AuthScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     onClick = { viewModel.onRegistrationClick() },
-                    enabled = !uiState.isLoading
+                    enabled = !uiState.isLoading()
                 ) {
                     Text("Register")
                 }

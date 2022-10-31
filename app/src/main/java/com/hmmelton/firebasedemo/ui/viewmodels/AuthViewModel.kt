@@ -1,21 +1,18 @@
 package com.hmmelton.firebasedemo.ui.viewmodels
 
-import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.util.PatternsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Response
+import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.utils.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,8 +36,8 @@ class AuthViewModel @Inject constructor(
         private set
 
     // Used for screen to track UI state
-    private val _uiState = MutableStateFlow(AuthUiState())
-    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+    var uiState = mutableStateOf<AuthUiState>(AuthUiState.AuthInit)
+        private set
 
     // Coroutine job prevents concurrent sign in/registration attempts
     private var authenticationJob: Job? = null
@@ -56,20 +53,14 @@ class AuthViewModel @Inject constructor(
 
             // Only process click if email and password are valid
             if (!invalidEmail) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = true,
-                        response = null
-                    )
-                }
+                uiState.value = AuthUiState.AuthLoading
                 val response = authManager.signInWithEmail(email, password)
 
                 // Update UI state with result of sign in attempt
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        response = response
-                    )
+                uiState.value = if (response is Error) {
+                    AuthUiState.AuthFailure(response)
+                } else {
+                    AuthUiState.AuthSuccess
                 }
             }
 
@@ -89,20 +80,14 @@ class AuthViewModel @Inject constructor(
 
             // Only process click if email and password are valid
             if (!invalidEmail && !invalidPassword) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = true,
-                        response = null
-                    )
-                }
+                uiState.value = AuthUiState.AuthLoading
                 val response = authManager.registerWithEmail(email, password)
 
                 // Update UI state with result of registration attempt
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        response = response
-                    )
+                uiState.value = if (response is Error) {
+                    AuthUiState.AuthFailure(response)
+                } else {
+                    AuthUiState.AuthSuccess
                 }
             }
 
@@ -114,7 +99,7 @@ class AuthViewModel @Inject constructor(
      * This function checks if the given email is formatted correctly.
      */
     private fun isValidEmail(email: String): Boolean {
-        return email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        return email.isNotEmpty() && PatternsCompat.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     /**
@@ -128,8 +113,11 @@ class AuthViewModel @Inject constructor(
 /**
  * Class for tracking UI state of auth screen
  */
-data class AuthUiState(
-    val isLoading: Boolean = false,
-    // Auth response initially null, as request has not been made
-    val response: Response? = null
-)
+sealed class AuthUiState(val response: Response?) {
+    object AuthInit: AuthUiState(null)
+    object AuthLoading: AuthUiState(null)
+    object AuthSuccess: AuthUiState(Success)
+    class AuthFailure(error: Error): AuthUiState(error)
+
+    fun isLoading() = this is AuthInit
+}
