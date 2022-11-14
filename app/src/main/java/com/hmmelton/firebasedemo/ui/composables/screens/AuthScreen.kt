@@ -8,16 +8,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,11 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.data.model.Error
+import com.hmmelton.firebasedemo.ui.composables.views.CircularProgressAnimated
 import com.hmmelton.firebasedemo.ui.composables.views.OutlinedTextFieldWithErrorView
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun AuthScreen(
@@ -41,8 +43,12 @@ fun AuthScreen(
     val uiState by viewModel.uiState
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var isLoaderVisible by rememberSaveable { mutableStateOf(false) }
 
     uiState.response?.let { response ->
+        // Hide progress indicator when new status is received
+        isLoaderVisible = false
+
         val currentOnAuthenticated by rememberUpdatedState(onAuthenticated)
         LaunchedEffect(uiState) {
             if (response is Error) {
@@ -87,7 +93,10 @@ fun AuthScreen(
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
-                    onClick = { viewModel.onSignInClick() },
+                    onClick = {
+                        isLoaderVisible = true
+                        viewModel.onSignInClick()
+                    },
                     enabled = !uiState.isLoading()
                 ) {
                     Text("Sign In")
@@ -98,10 +107,24 @@ fun AuthScreen(
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
-                    onClick = { viewModel.onRegistrationClick() },
+                    onClick = {
+                        isLoaderVisible = true
+                        viewModel.onRegistrationClick()
+                    },
                     enabled = !uiState.isLoading()
                 ) {
                     Text("Register")
+                }
+            }
+
+            // Show progress indicator when waiting for network requests
+            if (isLoaderVisible) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressAnimated(progressValue = 0.75f)
                 }
             }
         }

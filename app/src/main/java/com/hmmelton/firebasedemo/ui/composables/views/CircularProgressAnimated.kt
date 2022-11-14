@@ -7,9 +7,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 
 @Composable
-fun CircularProgressAnimated(progressValue: Float) {
+fun CircularProgressAnimated(modifier: Modifier = Modifier, progressValue: Float) {
     val infiniteTransition = rememberInfiniteTransition()
 
     val progressAnimationValue by infiniteTransition.animateFloat(
@@ -18,5 +19,5 @@ fun CircularProgressAnimated(progressValue: Float) {
         animationSpec = infiniteRepeatable(animation = tween(900))
     )
 
-    CircularProgressIndicator(progress = progressAnimationValue)
+    CircularProgressIndicator(modifier = modifier, progress = progressAnimationValue)
 }
