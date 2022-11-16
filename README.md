@@ -23,8 +23,8 @@ Code for the Firebase Cloud Functions is kept in a different repository. The cod
 
 ## Screenshots
 
-**Auth Screen**
+### Auth Screen:
 ![Authentication screen](screenshots/auth_screen.png)
 
-**Main Screen**
+### Main Screen:
 ![Authentication screen](screenshots/main_screen.png)
