@@ -20,3 +20,11 @@ Firebase:
 
 ## Related Code
 Code for the Firebase Cloud Functions is kept in a different repository. The code is not currently triggered by the client, but rather by Firebase triggers. The repository is [FirebaseDemo-CloudFunctions](https://github.com/hmmelton/FirebaseDemo-CloudFunctions).
+
+## Screenshots
+
+**Auth Screen**
+![Authentication screen](screenshots/auth_screen.png)
+
+**Main Screen**
+![Authentication screen](screenshots/main_screen.png)
