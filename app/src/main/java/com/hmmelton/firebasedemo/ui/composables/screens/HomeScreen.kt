@@ -14,10 +14,12 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hmmelton.firebasedemo.R
 import com.hmmelton.firebasedemo.ui.composables.RequestNotificationPermission
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 import com.hmmelton.firebasedemo.ui.viewmodels.MainViewModel
@@ -39,14 +41,14 @@ fun HomeScreen(
             imageVector = Icons.Default.AccountCircle,
             contentDescription = "Account icon"
         )
-        Text(text = "Welcome!", fontSize = 30.sp)
+        Text(text = stringResource(R.string.welcome_message), fontSize = 30.sp)
         Button(
             onClick = {
                 viewModel.signOut()
                 onSignedOut()
             }
         ) {
-            Text("Sign out")
+            Text(stringResource(R.string.btn_sign_out))
         }
 
         // If SDK version >= 33, we must request runtime permission for notifications

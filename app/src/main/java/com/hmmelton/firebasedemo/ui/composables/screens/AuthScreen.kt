@@ -22,12 +22,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hmmelton.firebasedemo.R
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.ui.composables.views.CircularProgressAnimated
 import com.hmmelton.firebasedemo.ui.composables.views.OutlinedTextFieldWithErrorView
@@ -70,7 +72,7 @@ fun AuthScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "FirebaseDemo", fontSize = 30.sp)
+                Text(text = stringResource(R.string.app_name), fontSize = 30.sp)
                 Spacer(modifier = Modifier.padding(8.dp))
 
                 // Credential inputs
@@ -100,7 +102,7 @@ fun AuthScreen(
                     },
                     enabled = !uiState.isLoading()
                 ) {
-                    Text("Sign In")
+                    Text(stringResource(R.string.btn_sign_in))
                 }
 
                 // Registration button
@@ -114,7 +116,7 @@ fun AuthScreen(
                     },
                     enabled = !uiState.isLoading()
                 ) {
-                    Text("Register")
+                    Text(stringResource(R.string.btn_register))
                 }
             }
 
@@ -143,9 +145,9 @@ fun EmailTextField(
         modifier = Modifier.fillMaxWidth(),
         value = value,
         onValueChange = { onValueChanged(it.trim()) },
-        label = { Text("Enter email") },
+        label = { Text(stringResource(R.string.email_field_label)) },
         isError = isError,
-        errorText = "Enter valid email",
+        errorText = stringResource(R.string.invalid_email_error),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         enabled = enabled
@@ -163,9 +165,9 @@ fun PasswordTextField(
         modifier = Modifier.fillMaxWidth(),
         value = value,
         onValueChange = { onValueChanged(it.trim()) },
-        label = { Text("Enter password") },
+        label = { Text(stringResource(R.string.password_field_label)) },
         isError = isError,
-        errorText = "Enter valid password",
+        errorText = stringResource(R.string.invalid_password_error),
         singleLine = true,
         visualTransformation = PasswordVisualTransformation() ,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

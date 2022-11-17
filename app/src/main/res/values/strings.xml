@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">Firebase Demo</string>
+
+    <!-- Home screen -->
+    <string name="welcome_message">Welcome!</string>
+
+    <!-- Auth screen -->
+    <string name="email_field_label">Enter email</string>
+    <string name="invalid_email_error">Enter valid email</string>
+    <string name="password_field_label">Enter password</string>
+    <string name="invalid_password_error">Enter valid password</string>
+
+    <!-- Buttons -->
+    <string name="btn_sign_in">Sign In</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_sign_out">Sign Out</string>
+    <string name="btn_ok">Ok</string>
+    <string name="btn_deny">Deny</string>
+    <string name="btn_close">Close</string>
+
+    <!-- Permission request -->
+    <string name="dialog_permission_request_title">Permission request</string>
+    <string name="dialog_open_settings_title">Open app settings</string>
+    <string name="notification_permission_rationale">Please grant notification permissions. They are important for this application.</string>
+    <string name="notification_permission_denied_message">Notification permission has been denied. Please approve notifications from app settings.</string>
 </resources>

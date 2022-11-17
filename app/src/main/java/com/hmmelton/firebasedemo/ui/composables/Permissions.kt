@@ -16,11 +16,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.hmmelton.firebasedemo.BuildConfig
+import com.hmmelton.firebasedemo.R
 
 /**
  * Composable for requesting system notification permissions. Only required for version
@@ -83,19 +85,18 @@ private fun NotificationPermissionDialog(
     if (openDialog) {
         AlertDialog(
             onDismissRequest = { openDialog = false },
-            title = { Text("Permission request") },
+            title = { Text(stringResource(R.string.dialog_permission_request_title)) },
             text = {
-                Text("Please grant notification permissions. They are important for this " +
-                        "application")
+                Text(stringResource(R.string.notification_permission_rationale))
             },
             confirmButton = {
                 Button(onClick = onConfirm) {
-                    Text("Ok")
+                    Text(stringResource(R.string.btn_ok))
                 }
             },
             dismissButton = {
                 Button(onClick = { openDialog = false }) {
-                    Text("Deny")
+                    Text(stringResource(R.string.btn_deny))
                 }
             }
         )
@@ -114,19 +115,18 @@ private fun OpenSettingsDialog(
     if (openDialog) {
         AlertDialog(
             onDismissRequest = { openDialog = false },
-            title = { Text("Open app settings") },
+            title = { Text(stringResource(R.string.dialog_open_settings_title)) },
             text = {
-                Text("Notification permission has been denied. Please approve notifications " +
-                        "from app settings.")
+                Text(stringResource(R.string.notification_permission_denied_message))
             },
             confirmButton = {
                 Button(onClick = onConfirm) {
-                    Text("Ok")
+                    Text(stringResource(R.string.btn_ok))
                 }
             },
             dismissButton = {
                 Button(onClick = { openDialog = false }) {
-                    Text("Close")
+                    Text(stringResource(R.string.btn_close))
                 }
             }
         )
