@@ -47,8 +47,13 @@ fun MainNavHost(
     // Listen for user to become unauthenticated, then navigate to login screen
     // TODO: check how this affects recomposition - need
     if (!authManager.observeAuthState().value) {
-        navController.navigate(Routes.LOGIN) {
-            popUpTo(Routes.HOME) { inclusive = true }
+        val currentRoute = navController.currentDestination?.route
+
+        // Done to prevent navigation during logout events on auth screen
+        if (currentRoute != Routes.LOGIN) {
+            navController.navigate(Routes.LOGIN) {
+                popUpTo(Routes.HOME) { inclusive = true }
+            }
         }
     }
 }

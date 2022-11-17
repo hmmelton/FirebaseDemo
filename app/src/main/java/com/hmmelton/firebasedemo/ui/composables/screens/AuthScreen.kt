@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
@@ -77,13 +76,15 @@ fun AuthScreen(
                 // Credential inputs
                 EmailTextField(
                     value = viewModel.email,
-                    isError = viewModel.invalidEmail
+                    isError = viewModel.invalidEmail,
+                    enabled = !uiState.isLoading()
                 ) { newEntry ->
                     viewModel.email = newEntry
                 }
                 PasswordTextField(
                     value = viewModel.password,
-                    isError = viewModel.invalidPassword
+                    isError = viewModel.invalidPassword,
+                    enabled = !uiState.isLoading()
                 ) { newEntry ->
                     viewModel.password = newEntry
                 }
@@ -135,6 +136,7 @@ fun AuthScreen(
 fun EmailTextField(
     value: String,
     isError: Boolean,
+    enabled: Boolean,
     onValueChanged: (String) -> Unit
 ) {
     OutlinedTextFieldWithErrorView(
@@ -145,7 +147,8 @@ fun EmailTextField(
         isError = isError,
         errorText = "Enter valid email",
         singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        enabled = enabled
     )
 }
 
@@ -153,6 +156,7 @@ fun EmailTextField(
 fun PasswordTextField(
     value: String,
     isError: Boolean,
+    enabled: Boolean,
     onValueChanged: (String) -> Unit
 ) {
     OutlinedTextFieldWithErrorView(
@@ -164,7 +168,8 @@ fun PasswordTextField(
         errorText = "Enter valid password",
         singleLine = true,
         visualTransformation = PasswordVisualTransformation() ,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        enabled = enabled
     )
 }
 

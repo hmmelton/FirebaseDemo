@@ -118,5 +118,5 @@ sealed class AuthUiState(val response: Response?) {
     object Success: AuthUiState(com.hmmelton.firebasedemo.data.model.Success)
     class Failure(error: Error): AuthUiState(error)
 
-    fun isLoading() = this is Init
+    fun isLoading() = this is Loading
 }
