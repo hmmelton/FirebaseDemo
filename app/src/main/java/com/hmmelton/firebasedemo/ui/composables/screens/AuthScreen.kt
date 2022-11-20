@@ -42,7 +42,7 @@ fun AuthScreen(
     viewModel: AuthViewModel = viewModel()
 ) {
     // TODO: test if this is working for circular loading indicator
-    val isLoading = viewModel.uiState.isLoading
+    val uiState = viewModel.uiState
     val formUiState = viewModel.formUiState
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -53,7 +53,7 @@ fun AuthScreen(
     LaunchedEffect(viewModel, lifecycle) {
         // Whenever the uiState changes, check if the user is logged in and
         // call the `onUserLogin` event when `lifecycle` is at least STARTED
-        snapshotFlow { viewModel.uiState }
+        snapshotFlow { uiState }
             .filter { it.isUserLoggedIn }
             .flowWithLifecycle(lifecycle)
             .collect {
@@ -96,14 +96,14 @@ fun AuthScreen(
                 EmailTextField(
                     value = formUiState.email,
                     isError = formUiState.invalidEmail,
-                    enabled = !isLoading
+                    enabled = !uiState.isLoading
                 ) { newEntry ->
                     viewModel.setEmail(newEntry)
                 }
                 PasswordTextField(
                     value = formUiState.password,
                     isError = formUiState.invalidPassword,
-                    enabled = !isLoading
+                    enabled = !uiState.isLoading
                 ) { newEntry ->
                     viewModel.setPassword(newEntry)
                 }
@@ -114,7 +114,7 @@ fun AuthScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     onClick = { viewModel.onSignInClick() },
-                    enabled = !isLoading
+                    enabled = !uiState.isLoading
                 ) {
                     Text(stringResource(R.string.btn_sign_in))
                 }
@@ -125,14 +125,14 @@ fun AuthScreen(
                         .padding(top = 8.dp)
                         .fillMaxWidth(),
                     onClick = { viewModel.onRegistrationClick() },
-                    enabled = !isLoading
+                    enabled = !uiState.isLoading
                 ) {
                     Text(stringResource(R.string.btn_register))
                 }
             }
 
             // Show progress indicator when waiting for network requests
-            if (isLoading) {
+            if (uiState.isLoading) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
