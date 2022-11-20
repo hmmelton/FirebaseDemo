@@ -43,6 +43,7 @@ fun AuthScreen(
 ) {
     // TODO: test if this is working for circular loading indicator
     val isLoading = viewModel.uiState.isLoading
+    val formUiState = viewModel.formUiState
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -93,18 +94,18 @@ fun AuthScreen(
 
                 // Credential inputs
                 EmailTextField(
-                    value = viewModel.email,
-                    isError = viewModel.invalidEmail,
+                    value = formUiState.email,
+                    isError = formUiState.invalidEmail,
                     enabled = !isLoading
                 ) { newEntry ->
-                    viewModel.email = newEntry
+                    viewModel.setEmail(newEntry)
                 }
                 PasswordTextField(
-                    value = viewModel.password,
-                    isError = viewModel.invalidPassword,
+                    value = formUiState.password,
+                    isError = formUiState.invalidPassword,
                     enabled = !isLoading
                 ) { newEntry ->
-                    viewModel.password = newEntry
+                    viewModel.setPassword(newEntry)
                 }
 
                 // Sign in button

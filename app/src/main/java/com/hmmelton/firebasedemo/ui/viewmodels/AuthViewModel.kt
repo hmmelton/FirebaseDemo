@@ -25,18 +25,12 @@ class AuthViewModel @Inject constructor(
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    // User inputs
-    var email by mutableStateOf("")
-    var password by mutableStateOf("")
-
-    // Flag if user entered invalid values
-    var invalidEmail by mutableStateOf(false)
-        private set
-    var invalidPassword by mutableStateOf(false)
-        private set
-
     // Used for screen to track UI state
     var uiState by mutableStateOf(AuthUiState())
+        private set
+
+    // Used for screen to track form input UI state
+    var formUiState by mutableStateOf(AuthFormUiState())
         private set
 
     // Coroutine job prevents concurrent sign in/registration attempts
@@ -50,12 +44,16 @@ class AuthViewModel @Inject constructor(
         if (authenticationJob != null) return
 
         authenticationJob = viewModelScope.launch(dispatcher) {
-            invalidEmail = !isValidEmail(email)
+            // Update form UI state with email/password validation
+            formUiState = formUiState.copy(
+                invalidEmail = !formUiState.isValidEmail(),
+                invalidPassword = false
+            )
 
             // Only process click if email and password are valid
-            if (!invalidEmail) {
+            if (!formUiState.invalidEmail) {
                 uiState = uiState.copy(isLoading = true)
-                val response = authManager.signInWithEmail(email, password)
+                val response = authManager.signInWithEmail(formUiState.email, formUiState.password)
 
                 // Update UI state with result of sign in attempt
                 uiState = AuthUiState(
@@ -76,13 +74,18 @@ class AuthViewModel @Inject constructor(
         if (authenticationJob != null) return
 
         authenticationJob = viewModelScope.launch(dispatcher) {
-            invalidEmail = !isValidEmail(email)
-            invalidPassword = !isValidPassword(password)
+            // Update form UI state with email/password validation
+            formUiState = formUiState.copy(
+                invalidEmail = !formUiState.isValidEmail(),
+                invalidPassword = !formUiState.isValidPassword()
+            )
 
             // Only process click if email and password are valid
-            if (!invalidEmail && !invalidPassword) {
+            if (!formUiState.invalidEmail && !formUiState.invalidPassword) {
                 uiState = uiState.copy(isLoading = true)
-                val response = authManager.registerWithEmail(email, password)
+                val response = authManager.registerWithEmail(
+                    formUiState.email, formUiState.password
+                )
 
                 // Update UI state with result of registration attempt
                 uiState = AuthUiState(
@@ -106,17 +109,17 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * This function checks if the given email is formatted correctly.
+     * Update email field in auth form
      */
-    private fun isValidEmail(email: String): Boolean {
-        return email.isNotEmpty() && PatternsCompat.EMAIL_ADDRESS.matcher(email).matches()
+    fun setEmail(email: String) {
+        formUiState = formUiState.copy(email = email)
     }
 
     /**
-     * This function checks if the given password matches requirements.
+     * Update password field in auth form.
      */
-    private fun isValidPassword(password: String): Boolean {
-        return password.length >= AuthManager.PASSWORD_MIN_LENGTH
+    fun setPassword(password: String) {
+        formUiState = formUiState.copy(password = password)
     }
 }
 
@@ -128,3 +131,27 @@ data class AuthUiState(
     @StringRes val errorMessage: Int? = null,
     val isUserLoggedIn: Boolean = false
 )
+
+/**
+ * Class for tracking UI state of auth form
+ */
+data class AuthFormUiState(
+    val email: String = "",
+    val password: String = "",
+    val invalidEmail: Boolean = false,
+    val invalidPassword: Boolean = false
+)
+
+/**
+ * This function checks if the given email is formatted correctly.
+ */
+fun AuthFormUiState.isValidEmail(): Boolean {
+    return email.isNotEmpty() && PatternsCompat.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+/**
+ * This function checks if the given password matches requirements.
+ */
+fun AuthFormUiState.isValidPassword(): Boolean {
+    return password.length >= AuthManager.PASSWORD_MIN_LENGTH
+}
