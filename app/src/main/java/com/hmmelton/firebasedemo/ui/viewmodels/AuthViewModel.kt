@@ -109,7 +109,7 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Update email field in auth form
+     * Update email field in auth form.
      */
     fun setEmail(email: String) {
         formUiState = formUiState.copy(email = email)
@@ -124,7 +124,7 @@ class AuthViewModel @Inject constructor(
 }
 
 /**
- * Class for tracking UI state of auth screen
+ * Class for tracking UI state of auth screen.
  */
 data class AuthUiState(
     val isLoading: Boolean = false,
@@ -133,7 +133,7 @@ data class AuthUiState(
 )
 
 /**
- * Class for tracking UI state of auth form
+ * Class for tracking UI state of auth form.
  */
 data class AuthFormUiState(
     val email: String = "",
