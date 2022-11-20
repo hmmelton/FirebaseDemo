@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.hmmelton.firebasedemo.R
 import com.hmmelton.firebasedemo.analytics.AnalyticsClient
 import com.hmmelton.firebasedemo.analytics.events.AuthType
 import com.hmmelton.firebasedemo.analytics.events.FetchUserFailureEvent
@@ -17,8 +18,6 @@ import com.hmmelton.firebasedemo.data.repository.Repository
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-private const val SIGN_IN_ERROR = "Failed to sign in"
-private const val REGISTRATION_ERROR = "Failed to register"
 private const val TAG = "FirebaseAuthManager"
 
 /**
@@ -46,7 +45,7 @@ class AuthManagerImpl @Inject constructor(
         return try {
             // Attempt to sign in and fetch authenticated FirebaseUser object
             val result = auth.signInWithEmailAndPassword(email, password).await()
-            val firebaseUser = result.user ?: return Error(SIGN_IN_ERROR)
+            val firebaseUser = result.user ?: return Error(R.string.sign_in_error)
 
             // If user was authenticated, create User object and save to server
             val user = userRepository.get(firebaseUser.uid)
@@ -59,12 +58,12 @@ class AuthManagerImpl @Inject constructor(
                 // Sign the user out if the User object cannot be read from the remote database
                 signOut()
                 analytics.logEvent(FetchUserFailureEvent(false))
-                Error(SIGN_IN_ERROR)
+                Error(R.string.sign_in_error)
             }
         } catch (e: Exception) {
             Log.e(TAG, "error signing in", e)
             analytics.logEvent(SignInFailureEvent(e, AuthType.EMAIL))
-            Error(SIGN_IN_ERROR)
+            Error(R.string.sign_in_error)
         }
     }
 
@@ -72,7 +71,7 @@ class AuthManagerImpl @Inject constructor(
         return try {
             // Attempt to register user and fetch authenticated FirebaseUser object
             val result = auth.createUserWithEmailAndPassword(email, password).await()
-            val firebaseUser = result.user ?: return Error(REGISTRATION_ERROR)
+            val firebaseUser = result.user ?: return Error(R.string.registration_error)
 
             // If user was authenticated, create User object and save to server
             val user = userRepository.get(firebaseUser.uid)
@@ -85,12 +84,12 @@ class AuthManagerImpl @Inject constructor(
                 // Sign the user out if the User object cannot be read from the remote database
                 signOut()
                 analytics.logEvent(FetchUserFailureEvent(true))
-                Error(REGISTRATION_ERROR)
+                Error(R.string.registration_error)
             }
         } catch (e: Exception) {
             Log.e(TAG, "error registering", e)
             analytics.logEvent(RegistrationFailureEvent(e, AuthType.EMAIL))
-            Error(REGISTRATION_ERROR)
+            Error(R.string.registration_error)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.hmmelton.firebasedemo.ui.viewmodels
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,7 +8,7 @@ import androidx.core.util.PatternsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hmmelton.firebasedemo.data.model.Error
-import com.hmmelton.firebasedemo.data.model.Response
+import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.utils.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,7 +36,7 @@ class AuthViewModel @Inject constructor(
         private set
 
     // Used for screen to track UI state
-    var uiState = mutableStateOf<AuthUiState>(AuthUiState.Init)
+    var uiState by mutableStateOf(AuthUiState())
         private set
 
     // Coroutine job prevents concurrent sign in/registration attempts
@@ -45,6 +46,7 @@ class AuthViewModel @Inject constructor(
      * This function processes the sign in button click.
      */
     fun onSignInClick() {
+        // TODO(best practices): re-evaluate if this should cancel or keep existing job
         if (authenticationJob != null) return
 
         authenticationJob = viewModelScope.launch(dispatcher) {
@@ -52,15 +54,15 @@ class AuthViewModel @Inject constructor(
 
             // Only process click if email and password are valid
             if (!invalidEmail) {
-                uiState.value = AuthUiState.Loading
+                uiState = uiState.copy(isLoading = true)
                 val response = authManager.signInWithEmail(email, password)
 
                 // Update UI state with result of sign in attempt
-                uiState.value = if (response is Error) {
-                    AuthUiState.Failure(response)
-                } else {
-                    AuthUiState.Success
-                }
+                uiState = AuthUiState(
+                    isLoading = false,
+                    errorMessage = (response as? Error)?.messageId,
+                    isUserLoggedIn = response is Success
+                )
             }
 
             authenticationJob = null
@@ -79,19 +81,28 @@ class AuthViewModel @Inject constructor(
 
             // Only process click if email and password are valid
             if (!invalidEmail && !invalidPassword) {
-                uiState.value = AuthUiState.Loading
+                uiState = uiState.copy(isLoading = true)
                 val response = authManager.registerWithEmail(email, password)
 
                 // Update UI state with result of registration attempt
-                uiState.value = if (response is Error) {
-                    AuthUiState.Failure(response)
-                } else {
-                    AuthUiState.Success
-                }
+                uiState = AuthUiState(
+                    isLoading = false,
+                    errorMessage = (response as? Error)?.messageId,
+                    isUserLoggedIn = response is Success
+                )
             }
 
             authenticationJob = null
         }
+    }
+
+    /**
+     * This function should be called after the user dismisses the error message, or it disappaers
+     * on its own.
+     */
+    fun errorMessageShown() {
+        // Remove error message from UI state to avoid accidental re-triggering of one-off event
+        uiState = uiState.copy(errorMessage = null)
     }
 
     /**
@@ -112,11 +123,8 @@ class AuthViewModel @Inject constructor(
 /**
  * Class for tracking UI state of auth screen
  */
-sealed class AuthUiState(val response: Response?) {
-    object Init: AuthUiState(null)
-    object Loading: AuthUiState(null)
-    object Success: AuthUiState(com.hmmelton.firebasedemo.data.model.Success)
-    class Failure(error: Error): AuthUiState(error)
-
-    fun isLoading() = this is Loading
-}
+data class AuthUiState(
+    val isLoading: Boolean = false,
+    @StringRes val errorMessage: Int? = null,
+    val isUserLoggedIn: Boolean = false
+)

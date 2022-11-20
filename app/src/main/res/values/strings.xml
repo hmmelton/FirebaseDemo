@@ -23,4 +23,8 @@
     <string name="dialog_open_settings_title">Open app settings</string>
     <string name="notification_permission_rationale">Please grant notification permissions. They are important for this application.</string>
     <string name="notification_permission_denied_message">Notification permission has been denied. Please approve notifications from app settings.</string>
+
+    <!-- Errors -->
+    <string name="sign_in_error">Failed to sign in</string>
+    <string name="registration_error">Failed to register</string>
 </resources>

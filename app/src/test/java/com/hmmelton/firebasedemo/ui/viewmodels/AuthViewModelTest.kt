@@ -23,7 +23,6 @@ class AuthViewModelTest {
         private const val VALID_EMAIL = "harrison@test.com"
         private const val VALID_PASSWORD = "12345678"
         private const val INVALID_PASSWORD = "123" // Only rule is must be >= 8 characters
-        private const val AUTH_ERROR = "Auth error"
     }
 
     @get:Rule
@@ -47,55 +46,52 @@ class AuthViewModelTest {
         val password = subject.password
         val invalidEmail = subject.invalidEmail
         val invalidPassword = subject.invalidPassword
-        val uiState = subject.uiState.value
+        val uiState = subject.uiState
 
         Assert.assertEquals("", email)
         Assert.assertEquals("", password)
         Assert.assertFalse(invalidEmail)
         Assert.assertFalse(invalidPassword)
-        Assert.assertTrue(uiState == AuthUiState.Init)
+        validateInitAuthUiState(uiState)
     }
 
     @Test
     fun `onSignInClick with invalid email causes early return`() {
         subject.onSignInClick()
 
-        val uiState = subject.uiState.value
-        Assert.assertEquals(AuthUiState.Init, uiState)
+        validateInitAuthUiState(subject.uiState)
         Assert.assertTrue(subject.invalidEmail)
         coVerify(exactly = 0) { authManager.signInWithEmail(any(), any()) }
     }
 
     @Test
     fun `onSignInClick updates uiState with error when auth fails`() {
-        val uiState = subject.uiState
         subject.email = VALID_EMAIL
         subject.password = VALID_PASSWORD
-        val authError = Error(AUTH_ERROR)
+        val authError = Error(0)
         coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers  {
-            Assert.assertEquals(AuthUiState.Loading, uiState.value)
+            Assert.assertTrue(subject.uiState.isLoading)
             authError
         }
 
         subject.onSignInClick()
 
-        Assert.assertTrue(uiState.value is AuthUiState.Failure)
+        validateAuthError(subject.uiState)
         coVerify(exactly = 1) { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) }
     }
 
     @Test
     fun `onSignInClick updates uiState with success when auth succeeds`() {
-        val uiState = subject.uiState
         subject.email = VALID_EMAIL
         subject.password = VALID_PASSWORD
         coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
-            Assert.assertEquals(AuthUiState.Loading, uiState.value)
+            Assert.assertTrue(subject.uiState.isLoading)
             Success
         }
 
         subject.onSignInClick()
 
-        Assert.assertEquals(AuthUiState.Success, uiState.value)
+        validateAuthSuccess(subject.uiState)
         coVerify(exactly = 1) { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) }
     }
 
@@ -106,8 +102,7 @@ class AuthViewModelTest {
 
         subject.onRegistrationClick()
 
-        val uiState = subject.uiState.value
-        Assert.assertEquals(AuthUiState.Init, uiState)
+        validateInitAuthUiState(subject.uiState)
         Assert.assertTrue(subject.invalidEmail)
         Assert.assertFalse(subject.invalidPassword)
         coVerify(exactly = 0) { authManager.registerWithEmail(any(), any()) }
@@ -120,8 +115,7 @@ class AuthViewModelTest {
 
         subject.onRegistrationClick()
 
-        val uiState = subject.uiState.value
-        Assert.assertEquals(AuthUiState.Init, uiState)
+        validateInitAuthUiState(subject.uiState)
         Assert.assertFalse(subject.invalidEmail)
         Assert.assertTrue(subject.invalidPassword)
         coVerify(exactly = 0) { authManager.registerWithEmail(any(), any()) }
@@ -129,34 +123,48 @@ class AuthViewModelTest {
 
     @Test
     fun `onRegistrationClick updates uiState with error when auth fails`() {
-        val uiState = subject.uiState
         subject.email = VALID_EMAIL
         subject.password = VALID_PASSWORD
-        val authError = Error(AUTH_ERROR)
+        val authError = Error(0)
         coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
-            Assert.assertEquals(AuthUiState.Loading, uiState.value)
+            Assert.assertTrue(subject.uiState.isLoading)
             authError
         }
 
         subject.onRegistrationClick()
 
-        Assert.assertTrue(uiState.value is AuthUiState.Failure)
+        validateAuthError(subject.uiState)
         coVerify(exactly = 1) { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) }
     }
 
     @Test
     fun `onRegistrationClick updates uiState with success when auth succeeds`() {
-        val uiState = subject.uiState
         subject.email = VALID_EMAIL
         subject.password = VALID_PASSWORD
         coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
-            Assert.assertEquals(AuthUiState.Loading, uiState.value)
+            Assert.assertTrue(subject.uiState.isLoading)
             Success
         }
 
         subject.onRegistrationClick()
 
-        Assert.assertEquals(AuthUiState.Success, uiState.value)
+        validateAuthSuccess(subject.uiState)
         coVerify(exactly = 1) { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) }
+    }
+
+    private fun validateInitAuthUiState(state: AuthUiState) {
+        Assert.assertFalse(state.isLoading)
+        Assert.assertNull(state.errorMessage)
+        Assert.assertFalse(state.isUserLoggedIn)
+    }
+
+    private fun validateAuthError(state: AuthUiState) {
+        Assert.assertNotNull(state.errorMessage)
+        Assert.assertFalse(state.isUserLoggedIn)
+    }
+
+    private fun validateAuthSuccess(state: AuthUiState) {
+        Assert.assertNull(state.errorMessage)
+        Assert.assertTrue(state.isUserLoggedIn)
     }
 }
