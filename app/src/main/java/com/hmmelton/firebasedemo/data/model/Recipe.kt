@@ -1,5 +1,6 @@
 package com.hmmelton.firebasedemo.data.model
 
+import com.google.gson.annotations.SerializedName
 import java.util.Date
 
 /**
@@ -12,7 +13,9 @@ data class Recipe(
     val category: String,
     val ingredients: Array<String>,
     val instructions: Array<String>,
+    @SerializedName("created_at")
     val createdAt: Date,
+    @SerializedName("updated_at")
     val updatedAt: Date
 ) {
     override fun equals(other: Any?): Boolean {
