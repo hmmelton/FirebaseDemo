@@ -1,7 +1,7 @@
 package com.hmmelton.firebasedemo.utils
 
 import androidx.compose.runtime.MutableState
-import com.hmmelton.firebasedemo.data.model.Response
+import com.hmmelton.firebasedemo.data.model.AuthResponse
 
 /**
  * Interface for authentication managers
@@ -19,12 +19,12 @@ interface AuthManager {
     /**
      * Sign in an existing user with email and password
      */
-    suspend fun signInWithEmail(email: String, password: String): Response
+    suspend fun signInWithEmail(email: String, password: String): AuthResponse
 
     /**
      * Register a new user with email and password
      */
-    suspend fun registerWithEmail(email: String, password: String): Response
+    suspend fun registerWithEmail(email: String, password: String): AuthResponse
 
     /**
      * Sign out current user

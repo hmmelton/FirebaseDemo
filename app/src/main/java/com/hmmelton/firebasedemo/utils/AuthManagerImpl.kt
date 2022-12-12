@@ -11,7 +11,7 @@ import com.hmmelton.firebasedemo.analytics.events.FetchUserFailureEvent
 import com.hmmelton.firebasedemo.analytics.events.RegistrationFailureEvent
 import com.hmmelton.firebasedemo.analytics.events.SignInFailureEvent
 import com.hmmelton.firebasedemo.data.model.Error
-import com.hmmelton.firebasedemo.data.model.Response
+import com.hmmelton.firebasedemo.data.model.AuthResponse
 import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.data.model.User
 import com.hmmelton.firebasedemo.data.repository.Repository
@@ -41,7 +41,7 @@ class AuthManagerImpl @Inject constructor(
 
     override fun observeAuthState() = _isAuthenticated
 
-    override suspend fun signInWithEmail(email: String, password: String): Response {
+    override suspend fun signInWithEmail(email: String, password: String): AuthResponse {
         return try {
             // Attempt to sign in and fetch authenticated FirebaseUser object
             val result = auth.signInWithEmailAndPassword(email, password).await()
@@ -67,7 +67,7 @@ class AuthManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun registerWithEmail(email: String, password: String): Response {
+    override suspend fun registerWithEmail(email: String, password: String): AuthResponse {
         return try {
             // Attempt to register user and fetch authenticated FirebaseUser object
             val result = auth.createUserWithEmailAndPassword(email, password).await()
