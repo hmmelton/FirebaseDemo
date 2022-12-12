@@ -1,3 +1,4 @@
 /build
 google-services.json
 firebasedemo-release-key.jks
+src/main/java/com/hmmelton/firebasedemo/utils/Keys.kt
