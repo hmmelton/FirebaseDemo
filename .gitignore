@@ -1,4 +1,6 @@
 *.iml
+*.log
+*.json
 .gradle
 /local.properties
 /.idea
@@ -9,7 +11,5 @@
 .cxx
 local.properties
 .firebaserc
-firebase-debug.log
-firebase.json
-ui-debug.log
 /saved-data
+storage.rules
