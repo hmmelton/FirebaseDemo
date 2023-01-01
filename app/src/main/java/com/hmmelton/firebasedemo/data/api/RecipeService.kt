@@ -1,16 +1,13 @@
 package com.hmmelton.firebasedemo.data.api
 
 import com.hmmelton.firebasedemo.data.model.Recipe
+import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 /**
- * This API is used to fetch articles from the NYT API.
- * @see [NYT API](https://developer.nytimes.com/apis)
+ * This API is used to fetch recipes from the app's Firebase Realtime Database.
  */
 interface RecipeService {
-    @GET("?orderBy=\"category\"")
-    suspend fun getRecipesForSection(
-        @Query("equalTo") category: String
-    ): List<Recipe>
+    @GET
+    suspend fun getRecipes(): Call<List<Recipe>>
 }
