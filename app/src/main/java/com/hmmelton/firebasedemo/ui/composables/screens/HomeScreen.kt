@@ -49,6 +49,8 @@ fun HomeScreen(
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
+    viewModel.getRecipes()
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {

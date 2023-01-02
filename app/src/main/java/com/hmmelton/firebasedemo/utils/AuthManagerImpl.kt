@@ -14,7 +14,7 @@ import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.AuthResponse
 import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.data.model.User
-import com.hmmelton.firebasedemo.data.repository.Repository
+import com.hmmelton.firebasedemo.data.repository.UserRepository
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ private const val TAG = "FirebaseAuthManager"
  */
 class AuthManagerImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val userRepository: Repository<User>,
+    private val userRepository: UserRepository,
     private val analytics: AnalyticsClient
 ) : AuthManager {
 

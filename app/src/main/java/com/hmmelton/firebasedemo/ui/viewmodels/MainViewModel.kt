@@ -3,16 +3,13 @@ package com.hmmelton.firebasedemo.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hmmelton.firebasedemo.analytics.AnalyticsClient
-import com.hmmelton.firebasedemo.analytics.events.RecipesDatabaseQueryFailureEvent
-import com.hmmelton.firebasedemo.data.api.RecipeService
 import com.hmmelton.firebasedemo.data.model.Recipe
+import com.hmmelton.firebasedemo.data.repository.RecipeRepository
 import com.hmmelton.firebasedemo.utils.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import retrofit2.await
 import javax.inject.Inject
 
 private const val TAG = "MainViewModel"
@@ -25,9 +22,8 @@ private const val TAG = "MainViewModel"
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val authManager: AuthManager,
-    private val recipeService: RecipeService,
-    private val dispatcher: CoroutineDispatcher,
-    private val analytics: AnalyticsClient
+    private val repository: RecipeRepository,
+    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val recipes = mutableListOf<Recipe>()
@@ -45,21 +41,24 @@ class MainViewModel @Inject constructor(
      * This function fetches recipes from the remote database.
      * TODO(recipes data): update this data fetch process to cache recipes in Room db
      */
-    suspend fun getRecipes() {
+    fun getRecipes() {
+        Log.d(TAG, "in getRecipes()")
         // If previous call to function is still fetching data, ignore newer calls
         if (getRecipesJob != null) return
+        Log.d(TAG, "job null")
 
         getRecipesJob = viewModelScope.launch(dispatcher) {
-            try {
-                // Fetch latest recipes and update recipe list
-                // TODO(recipes data): add more recipes and update this to use pagination
-                val result = recipeService.getRecipes().await()
+            Log.d(TAG, "in coroutine")
+            // Fetch latest recipes and update recipe list
+            // TODO(recipes data): add more recipes and update this to use pagination
+            val result = repository.getAll()
+            Log.d(TAG, "Recipes num: ${result?.size}")
+
+            // To avoid clearing data in the case of a database issue, only update data when query
+            // result is not null
+            result?.let { latestRecipes ->
                 recipes.clear()
-                recipes.addAll(result)
-            } catch (e: Exception) {
-                // Log error to console and analytics
-                Log.e(TAG, "error fetching recipes")
-                analytics.logEvent(RecipesDatabaseQueryFailureEvent(e))
+                recipes.addAll(latestRecipes)
             }
         }
 

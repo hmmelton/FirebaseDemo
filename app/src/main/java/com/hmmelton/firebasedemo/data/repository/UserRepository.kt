@@ -4,11 +4,10 @@ import android.util.Log
 import com.google.firebase.database.DatabaseReference
 import com.hmmelton.firebasedemo.analytics.AnalyticsClient
 import com.hmmelton.firebasedemo.analytics.events.UserDatabaseQueryFailureEvent
+import com.hmmelton.firebasedemo.binding.Users
 import com.hmmelton.firebasedemo.data.model.User
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 private const val TAG = "UserRepository"
 
@@ -17,15 +16,11 @@ private const val TAG = "UserRepository"
  * remotely.
  */
 class UserRepository @Inject constructor(
-    private val database: DatabaseReference,
+    @Users private val database: DatabaseReference,
     private val analytics: AnalyticsClient
-) : Repository<User> {
+) {
 
-    override suspend fun create(id: String, item: User): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun get(id: String): User? {
+    suspend fun get(id: String): User? {
         val snapshot = try {
             database.child(id).get().await()
         } catch (e: Exception) {
@@ -49,13 +44,5 @@ class UserRepository @Inject constructor(
         }
 
         return user
-    }
-
-    override suspend fun update(id: String, item: User): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun delete(id: String): Boolean {
-        TODO("Not yet implemented")
     }
 }
