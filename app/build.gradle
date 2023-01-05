@@ -4,6 +4,7 @@ plugins {
     id 'com.google.gms.google-services'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'kotlin-noarg'
 }
 
 android {
@@ -67,6 +68,11 @@ android {
         }
     }
     namespace 'com.hmmelton.firebasedemo'
+}
+
+noArg {
+    annotation("com.hmmelton.firebasedemo.binding.NoArg")
+    invokeInitializers = true
 }
 
 dependencies {

@@ -1,11 +1,14 @@
 package com.hmmelton.firebasedemo.data.model
 
 import com.google.gson.annotations.SerializedName
+import com.hmmelton.firebasedemo.binding.NoArg
+import com.hmmelton.firebasedemo.utils.contentEquals
 
 /**
  * Data class for a single recipe. The functions [equals] and [hashCode] are overridden as
  * recommended by Android Studio, due to the presence of [Array] constructor parameters.
  */
+@NoArg
 data class Recipe(
     val id: String,
     val title: String,
@@ -17,9 +20,9 @@ data class Recipe(
     val photoMainUri: String,
     @SerializedName("photo_thumbnail")
     val photoThumbnailUri: String,
-    val categories: Array<String>,
-    val ingredients: Array<String>,
-    val instructions: Array<String>
+    val categories: List<String>,
+    val ingredients: List<String>,
+    val instructions: List<String>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -34,9 +37,9 @@ data class Recipe(
         if (totalTimeMin != other.totalTimeMin) return false
         if (photoMainUri != other.photoMainUri) return false
         if (photoThumbnailUri != other.photoThumbnailUri) return false
-        if (!categories.contentEquals(other.categories)) return false
-        if (!ingredients.contentEquals(other.ingredients)) return false
-        if (!instructions.contentEquals(other.instructions)) return false
+        if (categories != other.categories) return false
+        if (ingredients != other.ingredients) return false
+        if (instructions != other.instructions) return false
 
         return true
     }
@@ -49,9 +52,9 @@ data class Recipe(
         result = 31 * result + totalTimeMin.hashCode()
         result = 31 * result + photoMainUri.hashCode()
         result = 31 * result + photoThumbnailUri.hashCode()
-        result = 31 * result + categories.contentHashCode()
-        result = 31 * result + ingredients.contentHashCode()
-        result = 31 * result + instructions.contentHashCode()
+        result = 31 * result + categories.hashCode()
+        result = 31 * result + ingredients.hashCode()
+        result = 31 * result + instructions.hashCode()
         return result
     }
 }

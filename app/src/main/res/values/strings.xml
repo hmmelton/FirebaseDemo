@@ -2,7 +2,7 @@
     <string name="app_name">Firebase Demo</string>
 
     <!-- Home screen -->
-    <string name="welcome_message">Welcome!</string>
+    <string name="no_recipes">No recipes available</string>
 
     <!-- Auth screen -->
     <string name="email_field_label">Enter email</string>

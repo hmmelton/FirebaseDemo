@@ -3,6 +3,7 @@ package com.hmmelton.firebasedemo.binding
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.hmmelton.firebasedemo.BuildConfig
 import com.hmmelton.firebasedemo.data.repository.RecipeRepository
 import com.hmmelton.firebasedemo.data.repository.UserRepository
 import dagger.Binds
@@ -17,27 +18,32 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DataModule {
 
+    private val database by lazy {
+        val db = Firebase.database
+        // Persist data locally
+        db.setPersistenceEnabled(true)
+        // According to documentation, 1MB is the min cache size
+        // https://firebase.google.com/docs/reference/android/com/google/firebase/database/FirebaseDatabase#setPersistenceCacheSizeBytes(long)
+        db.setPersistenceCacheSizeBytes(1024 * 1024)
+
+        if (BuildConfig.DEBUG) {
+            db.useEmulator("10.0.2.2", 9000)
+        }
+
+        db
+    }
+
     @Singleton
     @Provides
     @Users
     fun provideUsersDatabaseReference(): DatabaseReference {
-        return Firebase.database.reference.child("users")
+        return database.reference.child("users")
     }
 
     @Singleton
     @Provides
     @Recipes
     fun provideRecipesDatabaseReference(): DatabaseReference {
-        return Firebase.database.reference.child("recipes")
+        return database.reference.child("recipes")
     }
 }
-
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
-annotation class Users
-
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
-annotation class Recipes

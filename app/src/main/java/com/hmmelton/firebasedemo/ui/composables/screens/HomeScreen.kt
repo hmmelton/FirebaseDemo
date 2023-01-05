@@ -1,9 +1,7 @@
 package com.hmmelton.firebasedemo.ui.composables.screens
 
-import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -21,11 +18,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.R
-import com.hmmelton.firebasedemo.ui.composables.RequestNotificationPermission
+import com.hmmelton.firebasedemo.ui.composables.views.RecipeCard
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 import com.hmmelton.firebasedemo.ui.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
@@ -48,6 +45,7 @@ fun HomeScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+    val recipes = rememberSaveable { viewModel.recipes }
 
     viewModel.getRecipes()
 
@@ -67,25 +65,30 @@ fun HomeScreen(
             }
         }
     ) { contentPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
+        // If recipes list is not empty, display entries
+        if (recipes.isEmpty()) {
+            LazyColumn(
+                contentPadding = contentPadding,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(viewModel.recipes.size) { index ->
+                    RecipeCard(recipe = viewModel.recipes[index])
+                }
+            }
+        } else {
+            // show this column if the recipes list is empty
+            Column(
                 modifier = Modifier
-                    .height(120.dp)
-                    .width(120.dp),
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Account icon"
-            )
-            Text(text = stringResource(R.string.welcome_message), fontSize = 30.sp)
-
-            // If SDK version >= 33, we must request runtime permission for notifications
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                RequestNotificationPermission()
+                    .fillMaxSize()
+                    .padding(contentPadding),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(id = R.string.no_recipes),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
