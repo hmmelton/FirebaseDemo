@@ -1,17 +1,13 @@
 package com.hmmelton.firebasedemo.binding
 
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.hmmelton.firebasedemo.BuildConfig
-import com.hmmelton.firebasedemo.data.repository.RecipeRepository
-import com.hmmelton.firebasedemo.data.repository.UserRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -36,14 +32,14 @@ object DataModule {
     @Singleton
     @Provides
     @Users
-    fun provideUsersDatabaseReference(): DatabaseReference {
-        return database.reference.child("users")
-    }
+    fun provideUsersDatabaseReference() = database.reference.child("users")
 
     @Singleton
     @Provides
     @Recipes
-    fun provideRecipesDatabaseReference(): DatabaseReference {
-        return database.reference.child("recipes")
-    }
+    fun provideRecipesDatabaseReference() = database.reference.child("recipes")
+
+    @Singleton
+    @Provides
+    fun provideFileStorageReference() = Firebase.storage.reference
 }

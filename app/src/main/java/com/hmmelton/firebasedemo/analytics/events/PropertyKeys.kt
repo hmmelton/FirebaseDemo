@@ -8,6 +8,7 @@ object PropertyKeys {
     const val AUTH_TYPE = "auth_type"
     const val IS_REGISTRATION = "is_registration"
     const val ITEM_KEY = "item_key"
+    const val IMAGE_PATH = "image_path"
 
     // For testing
     const val TEST_PARAM = "test_param"

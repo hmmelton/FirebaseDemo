@@ -1,9 +1,10 @@
 package com.hmmelton.firebasedemo.ui.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hmmelton.firebasedemo.data.model.Recipe
+import com.hmmelton.firebasedemo.data.model.RecipeListItem
 import com.hmmelton.firebasedemo.data.repository.RecipeRepository
 import com.hmmelton.firebasedemo.utils.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +27,8 @@ class MainViewModel @Inject constructor(
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val recipes = mutableListOf<Recipe>()
+    var recipes = mutableStateOf<List<RecipeListItem>>(emptyList())
+        private set
 
     private var getRecipesJob: Job? = null
 
@@ -42,13 +44,10 @@ class MainViewModel @Inject constructor(
      * TODO(recipes data): update this data fetch process to cache recipes in Room db
      */
     fun getRecipes() {
-        Log.d(TAG, "in getRecipes()")
         // If previous call to function is still fetching data, ignore newer calls
         if (getRecipesJob != null) return
-        Log.d(TAG, "job null")
 
         getRecipesJob = viewModelScope.launch(dispatcher) {
-            Log.d(TAG, "in coroutine")
             // Fetch latest recipes and update recipe list
             // TODO(recipes data): add more recipes and update this to use pagination
             val result = repository.getAll()
@@ -57,8 +56,7 @@ class MainViewModel @Inject constructor(
             // To avoid clearing data in the case of a database issue, only update data when query
             // result is not null
             result?.let { latestRecipes ->
-                recipes.clear()
-                recipes.addAll(latestRecipes)
+                recipes.value = latestRecipes
             }
         }
 

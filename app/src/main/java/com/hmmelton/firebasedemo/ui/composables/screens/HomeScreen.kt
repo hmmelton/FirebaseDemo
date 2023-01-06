@@ -21,8 +21,9 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -45,8 +46,9 @@ fun HomeScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-    val recipes = rememberSaveable { viewModel.recipes }
+    val recipes by remember { viewModel.recipes }
 
+    // Fetch recipes to display
     viewModel.getRecipes()
 
     Scaffold(
@@ -66,13 +68,14 @@ fun HomeScreen(
         }
     ) { contentPadding ->
         // If recipes list is not empty, display entries
-        if (recipes.isEmpty()) {
+        if (recipes.isNotEmpty()) {
             LazyColumn(
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = contentPadding,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(viewModel.recipes.size) { index ->
-                    RecipeCard(recipe = viewModel.recipes[index])
+                items(recipes.size) { index ->
+                    RecipeCard(item = recipes[index])
                 }
             }
         } else {
