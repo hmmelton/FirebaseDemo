@@ -2,6 +2,7 @@ package com.hmmelton.firebasedemo.binding
 
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.hmmelton.firebasedemo.BuildConfig
 import dagger.Module
@@ -41,5 +42,13 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun provideFileStorageReference() = Firebase.storage.reference
+    fun provideFileStorageReference(): StorageReference {
+        val storage = Firebase.storage
+
+        if (BuildConfig.DEBUG) {
+            storage.useEmulator("10.0.2.2", 9199)
+        }
+
+        return storage.reference
+    }
 }

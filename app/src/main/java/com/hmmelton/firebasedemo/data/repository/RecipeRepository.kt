@@ -61,7 +61,8 @@ class RecipeRepository @Inject constructor(
 
             // If recipe was not null, attempt to fetch thumbnail image URI
             val thumbnailUrl = try {
-                storage.child(recipe.photoThumbnailUri).downloadUrl.await()
+                // TODO(recipes): resize thumbnail images
+                storage.child(recipe.photoMainUri).downloadUrl.await()
             } catch (e: Exception) {
                 Log.e(TAG, "error fetching thumbnail image", e)
                 analytics.logEvent(ThumbnailUriFetchFailureEvent(e, recipe.photoThumbnailUri))

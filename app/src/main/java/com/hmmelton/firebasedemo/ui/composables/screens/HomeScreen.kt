@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -69,10 +71,14 @@ fun HomeScreen(
     ) { contentPadding ->
         // If recipes list is not empty, display entries
         if (recipes.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                columns = GridCells.Fixed(2),
                 contentPadding = contentPadding,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(recipes.size) { index ->
                     RecipeCard(item = recipes[index])
