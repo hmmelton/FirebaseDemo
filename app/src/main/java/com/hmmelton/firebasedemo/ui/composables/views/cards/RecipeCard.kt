@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.ui.composables.views
+package com.hmmelton.firebasedemo.ui.composables.views.cards
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -22,7 +22,10 @@ import com.hmmelton.firebasedemo.data.model.RecipeListItem
  */
 @Composable
 fun RecipeCard(item: RecipeListItem) {
-    Card(elevation = 8.dp) {
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        elevation = 8.dp
+    ) {
         Column(modifier = Modifier.wrapContentHeight()) {
             AsyncImage(
                 modifier = Modifier

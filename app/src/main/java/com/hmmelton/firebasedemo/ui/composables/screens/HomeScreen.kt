@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -35,7 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.R
-import com.hmmelton.firebasedemo.ui.composables.views.RecipeCard
+import com.hmmelton.firebasedemo.ui.composables.views.cards.RecipeCard
+import com.hmmelton.firebasedemo.ui.composables.views.RecipeCategoryRow
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 import com.hmmelton.firebasedemo.ui.viewmodels.MainViewModel
 import kotlinx.coroutines.launch
@@ -71,11 +73,26 @@ fun HomeScreen(
         // If recipes list is not empty, display entries
         if (recipes.isNotEmpty()) {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
             ) {
+                item {
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text = stringResource(id = R.string.categories_label),
+                        style = MaterialTheme.typography.h4,
+                    )
+                }
+                item {
+                    RecipeCategoryRow(categories = viewModel.categories)
+                }
+                item {
+                    Divider(
+                        modifier = Modifier.padding(vertical = 16.dp),
+                        thickness = 8.dp
+                    )
+                }
                 items(recipes.size) { index ->
                     RecipeCard(item = recipes[index])
                 }

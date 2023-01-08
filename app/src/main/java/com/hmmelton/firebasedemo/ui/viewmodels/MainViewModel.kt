@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hmmelton.firebasedemo.R
+import com.hmmelton.firebasedemo.data.model.RecipeCategory
 import com.hmmelton.firebasedemo.data.model.RecipeListItem
 import com.hmmelton.firebasedemo.data.repository.RecipeRepository
 import com.hmmelton.firebasedemo.utils.AuthManager
@@ -29,6 +31,7 @@ class MainViewModel @Inject constructor(
 
     var recipes = mutableStateOf<List<RecipeListItem>>(emptyList())
         private set
+    val categories = repository.getCategories()
 
     private var getRecipesJob: Job? = null
 
