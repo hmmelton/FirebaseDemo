@@ -3,6 +3,7 @@
 
     <!-- Home screen -->
     <string name="no_recipes">No recipes available</string>
+    <string name="categories_label">Categories</string>
 
     <!-- Auth screen -->
     <string name="email_field_label">Enter email</string>
@@ -27,4 +28,12 @@
     <!-- Errors -->
     <string name="sign_in_error">Failed to sign in</string>
     <string name="registration_error">Failed to register</string>
+
+    <!-- Recipe categories -->
+    <string name="category_breakfast">Breakfast</string>
+    <string name="category_dinner">Dinner</string>
+    <string name="category_salad">Salad</string>
+    <string name="category_dessert">Dessert</string>
+    <string name="category_snack">Snack</string>
+    <string name="category_quick">Quick</string>
 </resources>
