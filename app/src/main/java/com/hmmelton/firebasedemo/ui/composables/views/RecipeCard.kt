@@ -8,41 +8,50 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.hmmelton.firebasedemo.data.model.RecipeListItem
 
+/**
+ * Composable used for single recipe in HomeScreen list.
+ */
 @Composable
 fun RecipeCard(item: RecipeListItem) {
-    Card(
-        elevation = 8.dp,
-        modifier = Modifier.aspectRatio(0.75f)
-    ) {
-        Column(
-            modifier = Modifier.wrapContentHeight()
-        ) {
+    Card(elevation = 8.dp) {
+        Column(modifier = Modifier.wrapContentHeight()) {
             AsyncImage(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f),
+                    .aspectRatio(2f)
+                    .fillMaxWidth(),
                 model = item.thumbnailImage,
                 contentDescription = null,
-                alignment = Alignment.TopCenter,
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
 
             Text(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .weight(1f),
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    top = 8.dp
+                ),
                 text = item.recipe.title,
                 fontWeight = FontWeight.Bold,
-                overflow = TextOverflow.Ellipsis
+                fontSize = 16.sp,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom = 8.dp
+                ),
+                text = item.recipe.author,
+                fontSize = 12.sp,
             )
         }
     }
