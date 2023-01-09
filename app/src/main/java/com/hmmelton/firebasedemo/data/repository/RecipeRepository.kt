@@ -2,16 +2,13 @@ package com.hmmelton.firebasedemo.data.repository
 
 import android.util.Log
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.storage.StorageReference
 import com.hmmelton.firebasedemo.R
 import com.hmmelton.firebasedemo.analytics.AnalyticsClient
 import com.hmmelton.firebasedemo.analytics.events.RecipeParseFailureEvent
 import com.hmmelton.firebasedemo.analytics.events.RecipesDatabaseQueryFailureEvent
-import com.hmmelton.firebasedemo.analytics.events.ThumbnailUriFetchFailureEvent
 import com.hmmelton.firebasedemo.binding.Recipes
 import com.hmmelton.firebasedemo.data.model.Recipe
 import com.hmmelton.firebasedemo.data.model.RecipeCategory
-import com.hmmelton.firebasedemo.data.model.RecipeListItem
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -22,7 +19,6 @@ private const val TAG = "RecipeRepository"
  */
 class RecipeRepository @Inject constructor(
     @Recipes private val database: DatabaseReference,
-    private val storage: StorageReference,
     private val analytics: AnalyticsClient
 ) {
 
@@ -32,7 +28,7 @@ class RecipeRepository @Inject constructor(
      *
      * @return List of all stored Recipes
      */
-    suspend fun getAll(): List<RecipeListItem>? {
+    suspend fun getAll(): List<Recipe>? {
         val snapshot = try {
             database.get().await()
         } catch (e: Exception) {
@@ -46,7 +42,7 @@ class RecipeRepository @Inject constructor(
             return null
         }
 
-        val result = mutableListOf<RecipeListItem>()
+        val result = mutableListOf<Recipe>()
 
         // Results must be deserialized individually
         for (recipeSnapshot in snapshot.children) {
@@ -59,19 +55,7 @@ class RecipeRepository @Inject constructor(
                 null
             } ?: continue
 
-            Log.d(TAG, recipe.toString())
-
-            // If recipe was not null, attempt to fetch thumbnail image URI
-            val thumbnailUrl = try {
-                // TODO(recipes): resize thumbnail images
-                storage.child(recipe.photoMainUri).downloadUrl.await()
-            } catch (e: Exception) {
-                Log.e(TAG, "error fetching thumbnail image", e)
-                analytics.logEvent(ThumbnailUriFetchFailureEvent(e, recipe.photoThumbnailUri))
-                null
-            }
-
-            result.add(RecipeListItem(recipe, thumbnailUrl.toString()))
+            result.add(recipe)
         }
 
         return result

@@ -15,13 +15,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.hmmelton.firebasedemo.data.model.RecipeListItem
+import com.hmmelton.firebasedemo.data.model.Recipe
 
 /**
  * Composable used for single recipe in HomeScreen list.
  */
 @Composable
-fun RecipeCard(item: RecipeListItem) {
+fun RecipeCard(recipe: Recipe) {
     Card(
         modifier = Modifier.padding(horizontal = 16.dp),
         elevation = 8.dp
@@ -31,7 +31,7 @@ fun RecipeCard(item: RecipeListItem) {
                 modifier = Modifier
                     .aspectRatio(2f)
                     .fillMaxWidth(),
-                model = item.thumbnailImage,
+                model = recipe.photoMainUri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
@@ -42,7 +42,7 @@ fun RecipeCard(item: RecipeListItem) {
                     end = 8.dp,
                     top = 8.dp
                 ),
-                text = item.recipe.title,
+                text = recipe.title,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 overflow = TextOverflow.Ellipsis,
@@ -53,7 +53,7 @@ fun RecipeCard(item: RecipeListItem) {
                     end = 8.dp,
                     bottom = 8.dp
                 ),
-                text = item.recipe.author,
+                text = recipe.author,
                 fontSize = 12.sp,
             )
         }

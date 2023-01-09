@@ -1,5 +1,6 @@
 package com.hmmelton.firebasedemo.data.model
 
+import androidx.annotation.Keep
 import com.hmmelton.firebasedemo.binding.NoArg
 
 /**
@@ -7,6 +8,7 @@ import com.hmmelton.firebasedemo.binding.NoArg
  * recommended by Android Studio, due to the presence of [Array] constructor parameters.
  */
 @NoArg
+@Keep
 data class Recipe(
     val uid: String,
     val title: String,
@@ -14,7 +16,6 @@ data class Recipe(
     val servings: Int,
     val totalTimeMin: Int,
     val photoMainUri: String,
-    val photoThumbnailUri: String,
     val categories: List<String>,
     val ingredients: List<String>,
     val directions: List<String>
@@ -31,7 +32,6 @@ data class Recipe(
         if (servings != other.servings) return false
         if (totalTimeMin != other.totalTimeMin) return false
         if (photoMainUri != other.photoMainUri) return false
-        if (photoThumbnailUri != other.photoThumbnailUri) return false
         if (categories != other.categories) return false
         if (ingredients != other.ingredients) return false
         if (directions != other.directions) return false
@@ -46,7 +46,6 @@ data class Recipe(
         result = 31 * result + servings.hashCode()
         result = 31 * result + totalTimeMin.hashCode()
         result = 31 * result + photoMainUri.hashCode()
-        result = 31 * result + photoThumbnailUri.hashCode()
         result = 31 * result + categories.hashCode()
         result = 31 * result + ingredients.hashCode()
         result = 31 * result + directions.hashCode()
@@ -62,7 +61,6 @@ data class Recipe(
                 servings=$servings,
                 totalTimeMin=$totalTimeMin,
                 photoMainUri='$photoMainUri',
-                photoThumbnailUri='$photoThumbnailUri',
                 categories=$categories,
                 ingredients=$ingredients,
                 instructions=$directions

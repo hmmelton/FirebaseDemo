@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hmmelton.firebasedemo.R
-import com.hmmelton.firebasedemo.data.model.RecipeCategory
-import com.hmmelton.firebasedemo.data.model.RecipeListItem
+import com.hmmelton.firebasedemo.data.model.Recipe
 import com.hmmelton.firebasedemo.data.repository.RecipeRepository
 import com.hmmelton.firebasedemo.utils.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +27,7 @@ class MainViewModel @Inject constructor(
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    var recipes = mutableStateOf<List<RecipeListItem>>(emptyList())
+    var recipes = mutableStateOf<List<Recipe>>(emptyList())
         private set
     val categories = repository.getCategories()
 

@@ -77,13 +77,16 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
             ) {
+                // Categories label
                 item {
                     Text(
                         modifier = Modifier.padding(16.dp),
                         text = stringResource(id = R.string.categories_label),
-                        style = MaterialTheme.typography.h4,
+                        style = MaterialTheme.typography.h5,
                     )
                 }
+
+                // Categories row
                 item {
                     RecipeCategoryRow(categories = viewModel.categories)
                 }
@@ -93,8 +96,10 @@ fun HomeScreen(
                         thickness = 8.dp
                     )
                 }
+
+                // Recipes list
                 items(recipes.size) { index ->
-                    RecipeCard(item = recipes[index])
+                    RecipeCard(recipe = recipes[index])
                 }
             }
         } else {
