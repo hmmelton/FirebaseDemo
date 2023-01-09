@@ -4,6 +4,7 @@
     <!-- Home screen -->
     <string name="no_recipes">No recipes available</string>
     <string name="categories_label">Categories</string>
+    <string name="header_text">Recipes sourced from Food Network</string>
 
     <!-- Auth screen -->
     <string name="email_field_label">Enter email</string>
