@@ -1,23 +1,19 @@
-package com.hmmelton.firebasedemo.ui.composables.screens
+package com.hmmelton.firebasedemo.ui.screens.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -29,127 +25,62 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.R
-import com.hmmelton.firebasedemo.ui.composables.views.RecipeCategoryRow
-import com.hmmelton.firebasedemo.ui.composables.views.cards.RecipeCard
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
-import com.hmmelton.firebasedemo.ui.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeRoute(
-    onSignedOut: () -> Unit,
-    viewModel: HomeViewModel = viewModel()
-) {
+fun HomeRoute(viewModel: HomeViewModel = viewModel()) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
+    HomeRoute(
+        uiState = uiState,
         scaffoldState = scaffoldState,
-        topBar = {
-            MainTopAppBar {
-                coroutineScope.launch {
-                    scaffoldState.drawerState.open()
-                }
+        onDrawerOpen = {
+            coroutineScope.launch {
+                scaffoldState.drawerState.open()
             }
         },
-        drawerContent = {
-            MainDrawerContent {
-                viewModel.signOut()
-                onSignedOut()
-            }
-        }
+        onSignOutButtonClick = { viewModel.signOut() },
+        onRecipeClick = { /*TODO*/ }) {
+
+    }
+}
+
+@Composable
+fun HomeRoute(
+    uiState: HomeUiState,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    onDrawerOpen: () -> Unit,
+    onSignOutButtonClick: () -> Unit,
+    onRecipeClick: () -> Unit,
+    onCategoryClick: () -> Unit
+) {
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = { MainTopAppBar(onDrawerOpen) },
+        drawerContent = { MainDrawerContent(onSignOutButtonClick) }
     ) { contentPadding ->
         // If recipes list is not empty, display entries
-        if (recipes.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
-            ) {
-                // Header
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(horizontal = 16.dp),
-                        elevation = 8.dp,
-                        backgroundColor = MaterialTheme.colors.secondaryVariant
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                modifier = Modifier.requiredSize(50.dp),
-                                painter = painterResource(id = R.drawable.ic_menu_book),
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .padding(16.dp),
-                                text = stringResource(id = R.string.header_text),
-                                color = Color.White,
-                                style = MaterialTheme.typography.h6,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-
-                // Categories label
-                item {
-                    Text(
-                        modifier = Modifier.padding(16.dp),
-                        text = stringResource(id = R.string.categories_label),
-                        style = MaterialTheme.typography.h5,
-                    )
-                }
-
-                // Categories row
-                item {
-                    RecipeCategoryRow(categories = viewModel.categories)
-                }
-                item {
-                    Divider(
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        thickness = 8.dp
-                    )
-                }
-
-                // Recipes list
-                items(recipes.size) { index ->
-                    RecipeCard(recipe = recipes[index])
-                }
-            }
+        if (uiState.recipes.isNotEmpty()) {
+            HomeScreenWithRecipes(
+                uiState = uiState,
+                onRecipeClick = onRecipeClick,
+                onCategoryClick = onCategoryClick
+            )
         } else {
-            // show this column if the recipes list is empty
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.no_recipes),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            // Otherwise, display empty state
+            HomeScreenEmpty(padding = contentPadding)
         }
     }
 }
@@ -229,6 +160,12 @@ private fun MainDrawerContent(onSignOutButtonClick: () -> Unit) {
 @Composable
 fun DefaultPreview() {
     FirebaseDemoTheme {
-        HomeRoute(onSignedOut = {})
+        HomeRoute(
+            uiState = HomeUiState(),
+            onDrawerOpen = {},
+            onSignOutButtonClick = {},
+            onRecipeClick = {},
+            onCategoryClick = {}
+        )
     }
 }

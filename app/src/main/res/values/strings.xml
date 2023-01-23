@@ -29,6 +29,7 @@
     <!-- Errors -->
     <string name="sign_in_error">Failed to sign in</string>
     <string name="registration_error">Failed to register</string>
+    <string name="recipe_query_error">Failed to fetch recipes</string>
 
     <!-- Recipe categories -->
     <string name="category_breakfast">Breakfast</string>
