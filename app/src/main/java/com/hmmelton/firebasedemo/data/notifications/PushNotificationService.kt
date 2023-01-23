@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.notifications
+package com.hmmelton.firebasedemo.data.notifications
 
 import android.app.PendingIntent
 import android.content.Intent

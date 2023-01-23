@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.hmmelton.firebasedemo.analytics.AnalyticsClient
 import com.hmmelton.firebasedemo.analytics.events.FetchUserFailureEvent
 import com.hmmelton.firebasedemo.analytics.events.SignInFailureEvent
+import com.hmmelton.firebasedemo.data.auth.AuthManagerImpl
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.data.model.User

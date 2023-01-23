@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.ui.composables.views
+package com.hmmelton.firebasedemo.ui.composables
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column

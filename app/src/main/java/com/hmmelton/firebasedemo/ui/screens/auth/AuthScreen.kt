@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.ui.composables.screens
+package com.hmmelton.firebasedemo.ui.screens.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,10 +30,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.R
-import com.hmmelton.firebasedemo.ui.composables.views.CircularProgressAnimated
-import com.hmmelton.firebasedemo.ui.composables.views.OutlinedTextFieldWithErrorView
+import com.hmmelton.firebasedemo.ui.composables.CircularProgressAnimated
+import com.hmmelton.firebasedemo.ui.composables.OutlinedTextFieldWithErrorView
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
-import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
 import kotlinx.coroutines.flow.filter
 
 @Composable

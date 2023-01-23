@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.ui.composables.views
+package com.hmmelton.firebasedemo.ui.composables
 
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable

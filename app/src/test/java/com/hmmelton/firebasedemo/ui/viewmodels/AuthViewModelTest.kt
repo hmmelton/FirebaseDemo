@@ -4,7 +4,10 @@ import androidx.core.util.PatternsCompat
 import com.hmmelton.firebasedemo.MainDispatcherRule
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Success
-import com.hmmelton.firebasedemo.utils.AuthManager
+import com.hmmelton.firebasedemo.data.auth.AuthManager
+import com.hmmelton.firebasedemo.ui.screens.auth.AuthFormUiState
+import com.hmmelton.firebasedemo.ui.screens.auth.AuthUiState
+import com.hmmelton.firebasedemo.ui.screens.auth.AuthViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.utils
+package com.hmmelton.firebasedemo.data.auth
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +13,6 @@ import com.hmmelton.firebasedemo.analytics.events.SignInFailureEvent
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.AuthResponse
 import com.hmmelton.firebasedemo.data.model.Success
-import com.hmmelton.firebasedemo.data.model.User
 import com.hmmelton.firebasedemo.data.repository.UserRepository
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject

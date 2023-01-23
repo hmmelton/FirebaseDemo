@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.utils
+package com.hmmelton.firebasedemo.data.auth
 
 import androidx.compose.runtime.MutableState
 import com.hmmelton.firebasedemo.data.model.AuthResponse

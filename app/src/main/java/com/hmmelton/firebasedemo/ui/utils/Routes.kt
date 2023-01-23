@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.utils
+package com.hmmelton.firebasedemo.ui.utils
 
 /**
  * Used to declare navigation routes

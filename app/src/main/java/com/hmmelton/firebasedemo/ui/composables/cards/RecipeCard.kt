@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.ui.composables.views.cards
+package com.hmmelton.firebasedemo.ui.composables.cards
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio

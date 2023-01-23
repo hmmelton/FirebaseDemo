@@ -1,16 +1,15 @@
-package com.hmmelton.firebasedemo.ui.composables
+package com.hmmelton.firebasedemo.ui.utils
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.hmmelton.firebasedemo.ui.composables.screens.AuthScreen
-import com.hmmelton.firebasedemo.ui.composables.screens.HomeRoute
-import com.hmmelton.firebasedemo.ui.viewmodels.AuthViewModel
-import com.hmmelton.firebasedemo.ui.viewmodels.HomeViewModel
-import com.hmmelton.firebasedemo.utils.AuthManager
-import com.hmmelton.firebasedemo.utils.Routes
+import com.hmmelton.firebasedemo.ui.screens.auth.AuthScreen
+import com.hmmelton.firebasedemo.ui.screens.home.HomeRoute
+import com.hmmelton.firebasedemo.ui.screens.auth.AuthViewModel
+import com.hmmelton.firebasedemo.ui.screens.home.HomeViewModel
+import com.hmmelton.firebasedemo.data.auth.AuthManager
 
 /**
  * Composable for [com.hmmelton.firebasedemo.MainActivity] navigation host.
@@ -31,15 +30,7 @@ fun MainNavHost(
         }
         composable(Routes.HOME) {
             val viewModel = hiltViewModel<HomeViewModel>()
-            HomeRoute(
-                onSignedOut = {
-                    navController.navigate(Routes.LOGIN) {
-                        // This removes the backstack
-                        popUpTo(Routes.HOME) { inclusive = true }
-                    }
-                },
-                viewModel = viewModel
-            )
+            HomeRoute(viewModel = viewModel)
         }
     }
 
@@ -51,6 +42,7 @@ fun MainNavHost(
         // Done to prevent navigation during logout events on auth screen
         if (currentRoute != Routes.LOGIN) {
             navController.navigate(Routes.LOGIN) {
+                // This removes the backstack
                 popUpTo(Routes.HOME) { inclusive = true }
             }
         }

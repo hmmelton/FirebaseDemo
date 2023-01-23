@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.ui.composables
+package com.hmmelton.firebasedemo.ui.utils
 
 import android.Manifest
 import android.content.Intent

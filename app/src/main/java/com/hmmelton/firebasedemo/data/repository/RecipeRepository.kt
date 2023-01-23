@@ -25,6 +25,7 @@ class RecipeRepository @Inject constructor(
     /**
      * This function retrieves all stored [Recipe] objects. There is currently no support for
      * filtering or pagination.
+     * TODO(recipes data): update this data fetch process to cache recipes in Room db
      *
      * @return List of all stored Recipes
      */

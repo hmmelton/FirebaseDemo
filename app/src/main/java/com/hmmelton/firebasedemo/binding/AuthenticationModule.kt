@@ -2,8 +2,8 @@ package com.hmmelton.firebasedemo.binding
 
 import com.google.firebase.auth.FirebaseAuth
 import com.hmmelton.firebasedemo.BuildConfig
-import com.hmmelton.firebasedemo.utils.AuthManager
-import com.hmmelton.firebasedemo.utils.AuthManagerImpl
+import com.hmmelton.firebasedemo.data.auth.AuthManager
+import com.hmmelton.firebasedemo.data.auth.AuthManagerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

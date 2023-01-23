@@ -1,4 +1,4 @@
-package com.hmmelton.firebasedemo.ui.viewmodels
+package com.hmmelton.firebasedemo.ui.screens.auth
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Success
-import com.hmmelton.firebasedemo.utils.AuthManager
+import com.hmmelton.firebasedemo.data.auth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job

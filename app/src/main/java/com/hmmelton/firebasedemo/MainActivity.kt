@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import com.hmmelton.firebasedemo.ui.composables.MainNavHost
+import com.hmmelton.firebasedemo.ui.utils.MainNavHost
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
-import com.hmmelton.firebasedemo.utils.AuthManager
-import com.hmmelton.firebasedemo.utils.Routes
+import com.hmmelton.firebasedemo.data.auth.AuthManager
+import com.hmmelton.firebasedemo.ui.utils.Routes
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
