@@ -69,27 +69,33 @@ class RecipeRepository @Inject constructor(
     fun getCategories() = listOf(
         RecipeCategory(
             nameResource = R.string.category_breakfast,
-            imageResource = R.drawable.ic_category_breakfast
+            imageResource = R.drawable.ic_category_breakfast,
+            name = "breakfast"
         ),
         RecipeCategory(
             nameResource = R.string.category_dinner,
-            imageResource = R.drawable.ic_category_dinner
+            imageResource = R.drawable.ic_category_dinner,
+            name = "dinner"
         ),
         RecipeCategory(
             nameResource = R.string.category_salad,
-            imageResource = R.drawable.ic_category_salad
+            imageResource = R.drawable.ic_category_salad,
+            name = "salad"
         ),
         RecipeCategory(
             nameResource = R.string.category_snack,
-            imageResource = R.drawable.ic_category_snack
+            imageResource = R.drawable.ic_category_snack,
+            name = "snack"
         ),
         RecipeCategory(
             nameResource = R.string.category_dessert,
-            imageResource = R.drawable.ic_category_dessert
+            imageResource = R.drawable.ic_category_dessert,
+            name = "dessert"
         ),
         RecipeCategory(
             nameResource = R.string.category_quick,
-            imageResource = R.drawable.ic_category_quick
+            imageResource = R.drawable.ic_category_quick,
+            name = "quick"
         )
     )
 }

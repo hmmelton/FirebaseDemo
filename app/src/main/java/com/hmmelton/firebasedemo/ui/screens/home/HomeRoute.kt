@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
+import androidx.compose.material.DrawerValue
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -19,10 +20,14 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -34,40 +39,43 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.R
+import com.hmmelton.firebasedemo.data.model.Recipe
+import com.hmmelton.firebasedemo.data.model.RecipeCategory
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeRoute(viewModel: HomeViewModel = viewModel()) {
-    val scaffoldState = rememberScaffoldState()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     HomeRoute(
         uiState = uiState,
-        scaffoldState = scaffoldState,
+        scaffoldState = rememberScaffoldState(),
         onDrawerOpen = {
             coroutineScope.launch {
-                scaffoldState.drawerState.open()
+                drawerState.open()
             }
         },
+        onErrorDismissed = { viewModel.removeErrorMessage(it) },
         onSignOutButtonClick = { viewModel.signOut() },
-        onRecipeClick = { /*TODO*/ }) {
-
-    }
+        onRecipeClick = { recipe -> viewModel.onRecipeClicked(recipe) },
+        onCategoryClick = { category -> viewModel.onCategoryClicked(category) }
+    )
 }
 
 @Composable
 fun HomeRoute(
     uiState: HomeUiState,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    scaffoldState: ScaffoldState,
     onDrawerOpen: () -> Unit,
+    onErrorDismissed: (Int) -> Unit,
     onSignOutButtonClick: () -> Unit,
-    onRecipeClick: () -> Unit,
-    onCategoryClick: () -> Unit
+    onRecipeClick: (Recipe) -> Unit,
+    onCategoryClick: (RecipeCategory) -> Unit
 ) {
     Scaffold(
-        scaffoldState = scaffoldState,
         topBar = { MainTopAppBar(onDrawerOpen) },
         drawerContent = { MainDrawerContent(onSignOutButtonClick) }
     ) { contentPadding ->
@@ -81,6 +89,33 @@ fun HomeRoute(
         } else {
             // Otherwise, display empty state
             HomeScreenEmpty(padding = contentPadding)
+        }
+    }
+
+    // Show error messages one at a time in Snackbar
+    if (uiState.errorMessages.isNotEmpty()) {
+        // Remember the first error message in the list
+        val errorMessage = remember(uiState) { uiState.errorMessages.first() }
+
+        // Get text for message and action button
+        // TODO: Change button to retry
+        val errorMessageText = stringResource(errorMessage)
+        val errorActionText = stringResource(R.string.btn_ok)
+
+        // This allows us to use the new value of onErrorDismissed, if it changes, without
+        // restarting the effect
+        val onDismissed by rememberUpdatedState(onErrorDismissed)
+
+        // Launch effect in coroutine, automatically cancelling and restarting effect
+        // with new values when any of the observed values change
+        LaunchedEffect(errorMessageText, scaffoldState) {
+            // Show snackbar
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = errorMessageText,
+                actionLabel = errorActionText
+            )
+
+            onDismissed(errorMessage)
         }
     }
 }
@@ -162,7 +197,9 @@ fun DefaultPreview() {
     FirebaseDemoTheme {
         HomeRoute(
             uiState = HomeUiState(),
+            scaffoldState = rememberScaffoldState(),
             onDrawerOpen = {},
+            onErrorDismissed = {},
             onSignOutButtonClick = {},
             onRecipeClick = {},
             onCategoryClick = {}

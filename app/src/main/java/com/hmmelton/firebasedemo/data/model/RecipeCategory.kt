@@ -5,5 +5,6 @@ import androidx.annotation.StringRes
 
 data class RecipeCategory(
     @StringRes val nameResource: Int,
-    @DrawableRes val imageResource: Int
+    @DrawableRes val imageResource: Int,
+    val name: String
 )

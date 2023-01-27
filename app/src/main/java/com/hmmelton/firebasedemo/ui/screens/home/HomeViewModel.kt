@@ -60,7 +60,26 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
+     * This function removes an error message from the UI state.
+     */
+    fun removeErrorMessage(message: Int) {
+        _uiState.update {
+            it.copy(errorMessages = it.errorMessages - message)
+        }
+    }
+
+    fun onRecipeClicked(recipe: Recipe) {
+        // TODO: navigate to recipe details screen
+    }
+
+    fun onCategoryClicked(category: RecipeCategory) {
+        // TODO: navigate to category screen
+    }
+
+    /**
      * This function fetches recipes from the remote database.
+     *
+     * TODO(recipes data): call this function when user does manual refresh
      */
     fun getRecipes() {
         // If previous call to function is still fetching data, ignore newer calls

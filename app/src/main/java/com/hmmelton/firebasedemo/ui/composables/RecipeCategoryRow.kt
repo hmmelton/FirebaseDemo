@@ -11,7 +11,8 @@ import com.hmmelton.firebasedemo.ui.composables.cards.RecipeCategoryCard
 @Composable
 fun RecipeCategoryRow(
     modifier: Modifier = Modifier,
-    categories: List<RecipeCategory>
+    categories: List<RecipeCategory>,
+    onCategoryClicked: (RecipeCategory) -> Unit
 ) {
     LazyRow(
         modifier = modifier,
@@ -19,7 +20,8 @@ fun RecipeCategoryRow(
     ) {
         items(categories.size) {
             RecipeCategoryCard(
-                item = categories[it]
+                item = categories[it],
+                onCategoryClicked = onCategoryClicked
             )
         }
     }

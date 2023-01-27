@@ -29,6 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hmmelton.firebasedemo.R
+import com.hmmelton.firebasedemo.data.model.Recipe
+import com.hmmelton.firebasedemo.data.model.RecipeCategory
 import com.hmmelton.firebasedemo.ui.composables.RecipeCategoryRow
 import com.hmmelton.firebasedemo.ui.composables.cards.RecipeCard
 import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
@@ -36,8 +38,8 @@ import com.hmmelton.firebasedemo.ui.theme.FirebaseDemoTheme
 @Composable
 fun HomeScreenWithRecipes(
     uiState: HomeUiState,
-    onRecipeClick: () -> Unit,
-    onCategoryClick: () -> Unit
+    onRecipeClick: (Recipe) -> Unit,
+    onCategoryClick: (RecipeCategory) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -88,7 +90,10 @@ fun HomeScreenWithRecipes(
 
         // Categories row
         item {
-            RecipeCategoryRow(categories = uiState.categories)
+            RecipeCategoryRow(
+                categories = uiState.categories,
+                onCategoryClicked = onCategoryClick
+            )
         }
         item {
             Divider(
@@ -104,7 +109,7 @@ fun HomeScreenWithRecipes(
                 recipe.uid
             }
         ) { recipe ->
-            RecipeCard(recipe = recipe)
+            RecipeCard(recipe = recipe) { onRecipeClick(it) }
         }
     }
 }

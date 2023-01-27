@@ -1,6 +1,7 @@
 package com.hmmelton.firebasedemo.ui.composables.cards
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
@@ -20,10 +21,11 @@ import com.hmmelton.firebasedemo.data.model.RecipeCategory
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun RecipeCategoryCard(item: RecipeCategory) {
+fun RecipeCategoryCard(item: RecipeCategory, onCategoryClicked: (RecipeCategory) -> Unit) {
     Card(
         modifier = Modifier
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 8.dp)
+            .clickable { onCategoryClicked(item) },
         elevation = 8.dp,
         onClick = {}
     ) {

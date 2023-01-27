@@ -1,5 +1,6 @@
 package com.hmmelton.firebasedemo.ui.composables.cards
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,9 +22,14 @@ import com.hmmelton.firebasedemo.data.model.Recipe
  * Composable used for single recipe in HomeScreen list.
  */
 @Composable
-fun RecipeCard(recipe: Recipe) {
+fun RecipeCard(
+    recipe: Recipe,
+    onClick: (Recipe) -> Unit
+) {
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clickable { onClick(recipe) },
         elevation = 8.dp
     ) {
         Column(modifier = Modifier.wrapContentHeight()) {
