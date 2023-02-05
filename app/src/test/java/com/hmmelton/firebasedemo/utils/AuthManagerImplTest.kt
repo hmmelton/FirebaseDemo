@@ -12,6 +12,7 @@ import com.hmmelton.firebasedemo.data.auth.AuthManagerImpl
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Success
 import com.hmmelton.firebasedemo.data.model.User
+import com.hmmelton.firebasedemo.data.repository.UserRepository
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -42,7 +43,7 @@ class AuthManagerImplTest {
     @MockK
     lateinit var auth: FirebaseAuth
     @MockK
-    lateinit var userRepository: Repository<User>
+    lateinit var userRepository: UserRepository
     @MockK
     lateinit var analytics: AnalyticsClient
 
