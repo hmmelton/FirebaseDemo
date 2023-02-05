@@ -1,20 +1,34 @@
 package com.hmmelton.firebasedemo.ui.screens.auth
 
 import androidx.annotation.StringRes
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.util.PatternsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hmmelton.firebasedemo.data.auth.AuthManager
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Success
-import com.hmmelton.firebasedemo.data.auth.AuthManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * Class for tracking UI state of auth screen.
+ */
+data class AuthUiState(
+    val isLoading: Boolean = false,
+    @StringRes val errorMessage: Int? = null,
+    val isUserLoggedIn: Boolean = false,
+    val email: String = "",
+    val password: String = "",
+    val invalidEmail: Boolean = false,
+    val invalidPassword: Boolean = false
+)
 
 /**
  * [ViewModel] used for authentication screen
@@ -26,12 +40,13 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Used for screen to track UI state
-    var uiState by mutableStateOf(AuthUiState())
-        private set
-
-    // Used for screen to track form input UI state
-    var formUiState by mutableStateOf(AuthFormUiState())
-        private set
+    private val _uiState = MutableStateFlow(AuthUiState())
+    val uiState = _uiState
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            AuthUiState()
+        )
 
     // Coroutine job prevents concurrent sign in/registration attempts
     private var authenticationJob: Job? = null
@@ -44,23 +59,31 @@ class AuthViewModel @Inject constructor(
         if (authenticationJob != null) return
 
         authenticationJob = viewModelScope.launch(dispatcher) {
+            val state = _uiState.value
+            val isValidEmail = isValidEmail(state.email)
+
             // Update form UI state with email/password validation
-            formUiState = formUiState.copy(
-                invalidEmail = !formUiState.isValidEmail(),
-                invalidPassword = false
-            )
+            _uiState.update {
+                it.copy(
+                    invalidEmail = !isValidEmail,
+                    invalidPassword = false
+                )
+            }
 
             // Only process click if email and password are valid
-            if (!formUiState.invalidEmail) {
-                uiState = uiState.copy(isLoading = true)
-                val response = authManager.signInWithEmail(formUiState.email, formUiState.password)
+            if (isValidEmail) {
+                _uiState.update { it.copy(isLoading = true) }
+                val response =
+                    authManager.signInWithEmail(state.email, state.password)
 
                 // Update UI state with result of sign in attempt
-                uiState = AuthUiState(
-                    isLoading = false,
-                    errorMessage = (response as? Error)?.messageId,
-                    isUserLoggedIn = response is Success
-                )
+                _uiState.update {
+                    AuthUiState(
+                        isLoading = false,
+                        errorMessage = (response as? Error)?.messageId,
+                        isUserLoggedIn = response is Success
+                    )
+                }
             }
 
             authenticationJob = null
@@ -74,25 +97,31 @@ class AuthViewModel @Inject constructor(
         if (authenticationJob != null) return
 
         authenticationJob = viewModelScope.launch(dispatcher) {
+            val state = _uiState.value
+            val isValidEmail = isValidEmail(state.email)
+            val isValidPassword = isValidPassword(state.password)
+
             // Update form UI state with email/password validation
-            formUiState = formUiState.copy(
-                invalidEmail = !formUiState.isValidEmail(),
-                invalidPassword = !formUiState.isValidPassword()
-            )
+            _uiState.update {
+                it.copy(
+                    invalidEmail = !isValidEmail,
+                    invalidPassword = !isValidPassword
+                )
+            }
 
             // Only process click if email and password are valid
-            if (!formUiState.invalidEmail && !formUiState.invalidPassword) {
-                uiState = uiState.copy(isLoading = true)
-                val response = authManager.registerWithEmail(
-                    formUiState.email, formUiState.password
-                )
+            if (isValidEmail && isValidPassword) {
+                _uiState.update { it.copy(isLoading = true) }
+                val response = authManager.registerWithEmail(state.email, state.password)
 
                 // Update UI state with result of registration attempt
-                uiState = AuthUiState(
-                    isLoading = false,
-                    errorMessage = (response as? Error)?.messageId,
-                    isUserLoggedIn = response is Success
-                )
+                _uiState.update {
+                    AuthUiState(
+                        isLoading = false,
+                        errorMessage = (response as? Error)?.messageId,
+                        isUserLoggedIn = response is Success
+                    )
+                }
             }
 
             authenticationJob = null
@@ -105,53 +134,33 @@ class AuthViewModel @Inject constructor(
      */
     fun errorMessageShown() {
         // Remove error message from UI state to avoid accidental re-triggering of one-off event
-        uiState = uiState.copy(errorMessage = null)
     }
 
     /**
      * Update email field in auth form.
      */
     fun setEmail(email: String) {
-        formUiState = formUiState.copy(email = email)
+        _uiState.update { it.copy(email = email) }
     }
 
     /**
      * Update password field in auth form.
      */
     fun setPassword(password: String) {
-        formUiState = formUiState.copy(password = password)
+        _uiState.update { it.copy(password = password) }
     }
-}
 
-/**
- * Class for tracking UI state of auth screen.
- */
-data class AuthUiState(
-    val isLoading: Boolean = false,
-    @StringRes val errorMessage: Int? = null,
-    val isUserLoggedIn: Boolean = false
-)
+    /**
+     * This function checks if the given email is formatted correctly.
+     */
+    private fun isValidEmail(email: String): Boolean {
+        return email.isNotEmpty() && PatternsCompat.EMAIL_ADDRESS.matcher(email).matches()
+    }
 
-/**
- * Class for tracking UI state of auth form.
- */
-data class AuthFormUiState(
-    val email: String = "",
-    val password: String = "",
-    val invalidEmail: Boolean = false,
-    val invalidPassword: Boolean = false
-)
-
-/**
- * This function checks if the given email is formatted correctly.
- */
-fun AuthFormUiState.isValidEmail(): Boolean {
-    return email.isNotEmpty() && PatternsCompat.EMAIL_ADDRESS.matcher(email).matches()
-}
-
-/**
- * This function checks if the given password matches requirements.
- */
-fun AuthFormUiState.isValidPassword(): Boolean {
-    return password.length >= AuthManager.PASSWORD_MIN_LENGTH
+    /**
+     * This function checks if the given password matches requirements.
+     */
+    private fun isValidPassword(password: String): Boolean {
+        return password.length >= AuthManager.PASSWORD_MIN_LENGTH
+    }
 }

@@ -2,10 +2,9 @@ package com.hmmelton.firebasedemo.ui.viewmodels
 
 import androidx.core.util.PatternsCompat
 import com.hmmelton.firebasedemo.MainDispatcherRule
+import com.hmmelton.firebasedemo.data.auth.AuthManager
 import com.hmmelton.firebasedemo.data.model.Error
 import com.hmmelton.firebasedemo.data.model.Success
-import com.hmmelton.firebasedemo.data.auth.AuthManager
-import com.hmmelton.firebasedemo.ui.screens.auth.AuthFormUiState
 import com.hmmelton.firebasedemo.ui.screens.auth.AuthUiState
 import com.hmmelton.firebasedemo.ui.screens.auth.AuthViewModel
 import io.mockk.coEvery
@@ -14,6 +13,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -45,104 +47,151 @@ class AuthViewModelTest {
 
     @Test
     fun `check initial field values are correct`() {
-        val uiState = subject.uiState
-        val formUiState = subject.formUiState
+        val uiState = subject.uiState.value
 
-        validateInitAuthUiState(uiState)
-        validateInitAuthFormUiState(formUiState)
+        Assert.assertFalse(uiState.isLoading)
+        Assert.assertNull(uiState.errorMessage)
+        Assert.assertFalse(uiState.isUserLoggedIn)
+        Assert.assertEquals("", uiState.email)
+        Assert.assertEquals("", uiState.password)
+        Assert.assertFalse(uiState.invalidEmail)
+        Assert.assertFalse(uiState.invalidPassword)
     }
 
     @Test
-    fun `onSignInClick with invalid email causes early return`() {
+    fun `onSignInClick with invalid email causes early return`() = runTest {
+        val uiStates = mutableListOf<AuthUiState>()
+        val collectJob = launch(mainDispatcherRule.testDispatcher) {
+            subject.uiState.toCollection(uiStates)
+        }
+
         subject.onSignInClick()
 
-        validateInitAuthUiState(subject.uiState)
-        Assert.assertTrue(subject.formUiState.invalidEmail)
+        Assert.assertEquals(2, uiStates.size)
+        Assert.assertTrue(uiStates.last().invalidEmail)
         coVerify(exactly = 0) { authManager.signInWithEmail(any(), any()) }
+
+        collectJob.cancel()
     }
 
     @Test
-    fun `onSignInClick updates uiState with error when auth fails`() {
+    fun `onSignInClick updates uiState with error when auth fails`() = runTest {
+        val uiStates = mutableListOf<AuthUiState>()
+        val collectJob = launch(mainDispatcherRule.testDispatcher) {
+            subject.uiState.toCollection(uiStates)
+        }
+
         givenValidCredentials()
         val authError = Error(0)
-        coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers  {
-            Assert.assertTrue(subject.uiState.isLoading)
-            authError
-        }
+        coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers  { authError }
 
         subject.onSignInClick()
 
-        validateAuthError(subject.uiState)
+        Assert.assertEquals(4, uiStates.size)
+        validateAuthError(uiStates.last())
         coVerify(exactly = 1) { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) }
+
+        collectJob.cancel()
     }
 
     @Test
-    fun `onSignInClick updates uiState with success when auth succeeds`() {
+    fun `onSignInClick updates uiState with success when auth succeeds`() = runTest {
+        val uiStates = mutableListOf<AuthUiState>()
+        val collectJob = launch(mainDispatcherRule.testDispatcher) {
+            subject.uiState.toCollection(uiStates)
+        }
+
         givenValidCredentials()
-        coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
-            Assert.assertTrue(subject.uiState.isLoading)
-            Success
-        }
+        coEvery { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers { Success }
 
         subject.onSignInClick()
 
-        validateAuthSuccess(subject.uiState)
+        Assert.assertEquals(4, uiStates.size)
+        validateAuthSuccess(uiStates.last())
         coVerify(exactly = 1) { authManager.signInWithEmail(VALID_EMAIL, VALID_PASSWORD) }
+
+        collectJob.cancel()
     }
 
     @Test
-    fun `onRegistrationClick with invalid email causes early return`() {
+    fun `onRegistrationClick with invalid email causes early return`() = runTest {
+        val uiStates = mutableListOf<AuthUiState>()
+        val collectJob = launch(mainDispatcherRule.testDispatcher) {
+            subject.uiState.toCollection(uiStates)
+        }
+
         // Set to ensure failure is from bad email
         subject.setPassword(VALID_PASSWORD)
 
         subject.onRegistrationClick()
 
-        validateInitAuthUiState(subject.uiState)
-        Assert.assertTrue(subject.formUiState.invalidEmail)
-        Assert.assertFalse(subject.formUiState.invalidPassword)
+        val uiState = uiStates.last()
+        Assert.assertEquals(3, uiStates.size)
+        Assert.assertTrue(uiState.invalidEmail)
+        Assert.assertFalse(uiState.invalidPassword)
         coVerify(exactly = 0) { authManager.registerWithEmail(any(), any()) }
+
+        collectJob.cancel()
     }
 
     @Test
-    fun `onRegistrationClick with invalid password causes early return`() {
+    fun `onRegistrationClick with invalid password causes early return`() = runTest {
+        val uiStates = mutableListOf<AuthUiState>()
+        val collectJob = launch(mainDispatcherRule.testDispatcher) {
+            subject.uiState.toCollection(uiStates)
+        }
+
         subject.setEmail(VALID_EMAIL)
         subject.setPassword(INVALID_PASSWORD)
 
         subject.onRegistrationClick()
 
-        validateInitAuthUiState(subject.uiState)
-        Assert.assertFalse(subject.formUiState.invalidEmail)
-        Assert.assertTrue(subject.formUiState.invalidPassword)
+        val uiState = uiStates.last()
+        Assert.assertEquals(4, uiStates.size)
+        Assert.assertFalse(uiState.invalidEmail)
+        Assert.assertTrue(uiState.invalidPassword)
         coVerify(exactly = 0) { authManager.registerWithEmail(any(), any()) }
+
+        collectJob.cancel()
     }
 
     @Test
-    fun `onRegistrationClick updates uiState with error when auth fails`() {
+    fun `onRegistrationClick updates uiState with error when auth fails`() = runTest {
+        val uiStates = mutableListOf<AuthUiState>()
+        val collectJob = launch(mainDispatcherRule.testDispatcher) {
+            subject.uiState.toCollection(uiStates)
+        }
+
         givenValidCredentials()
         val authError = Error(0)
-        coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
-            Assert.assertTrue(subject.uiState.isLoading)
-            authError
-        }
+        coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers { authError }
 
         subject.onRegistrationClick()
 
-        validateAuthError(subject.uiState)
+        Assert.assertEquals(4, uiStates.size)
+        validateAuthError(uiStates.last())
         coVerify(exactly = 1) { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) }
+
+        collectJob.cancel()
     }
 
     @Test
-    fun `onRegistrationClick updates uiState with success when auth succeeds`() {
-        givenValidCredentials()
-        coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers {
-            Assert.assertTrue(subject.uiState.isLoading)
-            Success
+    fun `onRegistrationClick updates uiState with success when auth succeeds`() = runTest {
+        val uiStates = mutableListOf<AuthUiState>()
+        val collectJob = launch(mainDispatcherRule.testDispatcher) {
+            subject.uiState.toCollection(uiStates)
         }
+
+        givenValidCredentials()
+        coEvery { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) } answers { Success }
 
         subject.onRegistrationClick()
 
-        validateAuthSuccess(subject.uiState)
+        Assert.assertEquals(4, uiStates.size)
+        validateAuthSuccess(uiStates.last())
         coVerify(exactly = 1) { authManager.registerWithEmail(VALID_EMAIL, VALID_PASSWORD) }
+
+        collectJob.cancel()
     }
 
     /**
@@ -151,25 +200,6 @@ class AuthViewModelTest {
     private fun givenValidCredentials() {
         subject.setEmail(VALID_EMAIL)
         subject.setPassword(VALID_PASSWORD)
-    }
-
-    /**
-     * Function to validate initial values of subject's [AuthUiState]
-     */
-    private fun validateInitAuthUiState(state: AuthUiState) {
-        Assert.assertFalse(state.isLoading)
-        Assert.assertNull(state.errorMessage)
-        Assert.assertFalse(state.isUserLoggedIn)
-    }
-
-    /**
-     * Function to validate initial values of subject's [AuthFormUiState]
-     */
-    private fun validateInitAuthFormUiState(state: AuthFormUiState) {
-        Assert.assertEquals("", state.email)
-        Assert.assertEquals("", state.password)
-        Assert.assertFalse(state.invalidEmail)
-        Assert.assertFalse(state.invalidPassword)
     }
 
     /**

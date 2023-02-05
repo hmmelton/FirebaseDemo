@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hmmelton.firebasedemo.R
@@ -41,8 +42,7 @@ fun AuthScreen(
     viewModel: AuthViewModel = viewModel()
 ) {
     // TODO: test if this is working for circular loading indicator
-    val uiState = viewModel.uiState
-    val formUiState = viewModel.formUiState
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -61,7 +61,7 @@ fun AuthScreen(
     }
 
     // Listen for error messages, and display them to the user
-    viewModel.uiState.errorMessage?.let { errorMessageId ->
+    uiState.errorMessage?.let { errorMessageId ->
         val errorMessageString = stringResource(errorMessageId)
         LaunchedEffect(errorMessageId, lifecycle) {
             // Snackbars here are used to notify user of auth error, so no need to read result
@@ -93,15 +93,15 @@ fun AuthScreen(
 
                 // Credential inputs
                 EmailTextField(
-                    value = formUiState.email,
-                    isError = formUiState.invalidEmail,
+                    value = uiState.email,
+                    isError = uiState.invalidEmail,
                     enabled = !uiState.isLoading
                 ) { newEntry ->
                     viewModel.setEmail(newEntry)
                 }
                 PasswordTextField(
-                    value = formUiState.password,
-                    isError = formUiState.invalidPassword,
+                    value = uiState.password,
+                    isError = uiState.invalidPassword,
                     enabled = !uiState.isLoading
                 ) { newEntry ->
                     viewModel.setPassword(newEntry)
